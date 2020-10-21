@@ -43,6 +43,7 @@ git clone https://github.com/naoki-mizuno/ds4_driver
 In order to consistently detect the robots every reboot, we need to setup the Udev rules for it. Default UDEV rules are in our our stack. You can copy it via
 ```bash
 sudo cp src/rr_openrover_stack/udev/roverrobotics.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 ## Installing Dual Shock 4 (Ps4 Controller Driver)
 The following steps are to help you 
