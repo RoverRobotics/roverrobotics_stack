@@ -1,4 +1,4 @@
-# rr_openrover_stack
+# About this stack
 
 A ROS1 stack that handles communication between Rover Robotics rover platforms and computer payloads.
 The rover platform accept velocity commands and publishes wheel encoder data and power information.
@@ -33,7 +33,7 @@ cd src/
 Use the git to clone our repository
 
 ```bash
-git clone https://github.com/roverrobotics/rr_openrover_stack
+git clone https://github.com/roverrobotics/rr_openrover_stack rr_openrover_stack
 ```
 Clone ps4 ROS driver(optional). Need Driver from Below if install.
 ```bash
@@ -104,4 +104,4 @@ This is useful for those who just want to drive the robot around.
 
 Run this command to inside your ROS Workspace install the startup script
 ```bash
-sudo src/rr_openrover_stack/opscripts.sh
+sudo src/rr_openrover_stack/opscripts/install.sh
