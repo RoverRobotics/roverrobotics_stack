@@ -2,12 +2,24 @@
 Changelog for package rr_openrover_simulation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+<<<<<<< HEAD
 1.0.1 (2020-06-15)
 ------------------
 * updating packge dependencies
 * update package.xml rr_openrover_simulation to properly list gazebo rosdep
 * Contributors: padiln
 
+=======
+1.1.1 (2020-06-15)
+------------------
+* add pyserial to package.xml
+* Contributors: padiln
+
+1.1.0 (2020-06-08)
+------------------
+* release to melodic
+
+>>>>>>> upstream/melodic_with_v2support
 1.0.0 (2020-06-08)
 ------------------
 * update simulation package version

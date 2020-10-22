@@ -97,9 +97,15 @@ A_BUTTON_TOGGLE = rospy.get_param('~a_button_toggle', False)
 B_BUTTON_TOGGLE = rospy.get_param('~b_button_toggle', False)
 X_BUTTON_TOGGLE = rospy.get_param('~x_button_toggle', False)
 Y_BUTTON_TOGGLE = rospy.get_param('~y_button_toggle', False)
+<<<<<<< HEAD
 MIN_TOGGLE_DUR = 0.5
 DRIVE_INCREMENTS = rospy.get_param('~drive_increment', 20.0)
 FLIPPER_INCREMENTS = rospy.get_param('~drive_increment', 20.0)
+=======
+MIN_TOGGLE_DUR = 0.5  #
+DRIVE_INCREMENTS = rospy.get_param('~drive_increment', 20.0)
+FLIPPER_INCREMENTS = rospy.get_param('~flipper_increment', 20.0)
+>>>>>>> upstream/melodic_with_v2support
 DEADBAND = 0.2
 FWD_ACC_LIM = 0.2
 TRN_ACC_LIM = 0.4
@@ -114,7 +120,7 @@ x_button_msg.data = False
 y_button_msg = Bool()
 y_button_msg.data = False
 
-# define publishers  
+# define publishers
 pub = rospy.Publisher('/cmd_vel/joystick', TwistStamped, queue_size=3)
 a_button_pub = rospy.Publisher('/joystick/a_button', Bool, queue_size=1, latch=True)
 b_button_pub = rospy.Publisher('/joystick/b_button', Bool, queue_size=1, latch=True)

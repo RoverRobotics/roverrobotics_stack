@@ -1,7 +1,11 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>rr_rover_zero_driver</name>
+<<<<<<< HEAD
   <version>1.0.1</version>
+=======
+  <version>1.1.1</version>
+>>>>>>> upstream/melodic_with_v2support
   <description>The rover_zero_driver package</description>
   <maintainer email="nickp@todo.todo">nickp</maintainer>
 
@@ -19,4 +23,8 @@
   <depend>std_msgs</depend>
   <depend>python_orocos_kdl</depend>
   <depend>python-serial</depend>
+<<<<<<< HEAD
 </package>
+=======
+</package>
+>>>>>>> upstream/melodic_with_v2support

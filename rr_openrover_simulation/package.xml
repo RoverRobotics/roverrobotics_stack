@@ -1,7 +1,11 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>rr_openrover_simulation</name>
+<<<<<<< HEAD
   <version>1.0.1</version>
+=======
+  <version>1.1.1</version>
+>>>>>>> upstream/melodic_with_v2support
   <description>The rr_openrover_simulation package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->

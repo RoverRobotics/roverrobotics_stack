@@ -1,0 +1,16 @@
+#!/bin/bash
+source ~/catkin_ws/devel/setup.bash
+source /etc/roverrobotics/env.sh
+export ROS_HOME=$(echo ~rover)/.ros
+if [ -h "/dev/rover" ]; then
+	roslaunch rr_openrover_driver starterkit_bringup.launch &
+	echo "Launched Rover Pro driver from service"
+elif [ -h "/dev/rover-zero" ]; then
+	roslaunch rr_rover_zero_driver teleop.launch &
+	echo "Launched Rover Zero driver from service"
+else
+	echo "No Robot Found, is your Udev Rule setup correctly?"
+	exit 1
+fi
+PID=$!
+wait "$PID"

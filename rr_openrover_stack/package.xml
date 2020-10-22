@@ -1,7 +1,11 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>rr_openrover_stack</name>
+<<<<<<< HEAD
   <version>1.0.1</version>
+=======
+  <version>1.1.1</version>
+>>>>>>> upstream/melodic_with_v2support
   <description>
     Packages related to the operation of Rover Robotics rover hardware.  This includes a client
     for interfacing with the hardware (rr_openrover_driver) and a tool for filtering time stamped
@@ -13,13 +17,14 @@
 
   <license>BSD</license>
 
+  <buildtool_depend>catkin</buildtool_depend>
+
   <exec_depend>rr_openrover_driver</exec_depend>
   <exec_depend>rr_rover_zero_driver</exec_depend>
   <exec_depend>rr_openrover_driver_msgs</exec_depend>
   <exec_depend>rr_control_input_manager</exec_depend>
   <exec_depend>rr_openrover_description</exec_depend>
   <exec_depend>rr_openrover_simulation</exec_depend>
-  <buildtool_depend>catkin</buildtool_depend>
 
   <export>
     <metapackage/>
