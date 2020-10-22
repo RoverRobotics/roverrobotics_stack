@@ -1,6 +1,6 @@
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
+sudo apt remove modemmanager -y
 sudo mkdir -p /etc/roverrobotics
 sudo cp $DIR/env.sh /etc/roverrobotics/env.sh
 sudo cp $DIR/roscore.service /etc/systemd/system/roscore.service
