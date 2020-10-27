@@ -35,7 +35,7 @@ include_directories(
 
 add_executable(rr_canrover_driver_node src/canrover_driver.cpp)
 add_dependencies(rr_canrover_driver_node ${catkin_EXPORTED_TARGETS})
-target_link_libraries(rr_canrover_driver_node ${catkin_LIBRARIES}
+target_link_libraries(rr_canrover_driver_node ${catkin_LIBRARIES})
 
 #############
 ## Install ##
