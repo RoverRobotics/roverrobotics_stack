@@ -38,8 +38,8 @@ namespace canrover
                                                                       nh_priv_(nh_priv),
                                                                       device_("can0"),
                                                                       e_stop_on_(false),
-                                                                      LEFT_MOTOR_ID(1),
-                                                                      RIGHT_MOTOR_ID(2)
+                                                                      LEFT_MOTOR_ID_(1),
+                                                                      RIGHT_MOTOR_ID_(2)
   {
     ROS_INFO("Initializing Rover Can Driver");
   }
@@ -54,7 +54,6 @@ namespace canrover
 
     ROS_INFO("Successfuly setup robot parameters");
     cmd_vel_sub = nh_priv_.subscribe("/cmd_vel/managed", 1, &CanRover::cmdVelCB, this);
-    fan_speed_sub = nh_priv_.subscribe("/rr_canrover_driver/fan_speed", 1, &CanRover::fanSpeedCB, this);
     e_stop_sub = nh_priv_.subscribe("/soft_estop/enable", 1, &CanRover::eStopCB, this);
     e_stop_reset_sub = nh_priv_.subscribe("/soft_estop/reset", 1, &CanRover::eStopResetCB, this);
     return true;
