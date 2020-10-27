@@ -99,8 +99,8 @@ namespace canrover
         prev_e_stop_state_ = true;
         ROS_WARN("Rover driver - Soft e-stop on.");
       }
-      CanSetDuty(LEFT_MOTOR_ID, MOTOR_NEUTRAL);
-      CanSetDuty(RIGHT_MOTOR_ID, MOTOR_NEUTRAL);
+      CanSetDuty(LEFT_MOTOR_ID_, MOTOR_NEUTRAL);
+      CanSetDuty(RIGHT_MOTOR_ID_, MOTOR_NEUTRAL);
       return;
     }
     else
