@@ -41,6 +41,7 @@ public:
   bool verifyParams();
   void serialManager();
   bool e_stop_on_;
+  float clip(float n, float lower, float upper);
 
 private:
   // ROS Parameters
@@ -59,7 +60,7 @@ private:
 
   const int LEFT_MOTOR_ID_;
   const int RIGHT_MOTOR_ID_;
- 
+  const int MOTOR_NEUTRAL = 0;
   int motor_speed_linear_coef_;
   int motor_speed_angular_coef_;
   int motor_speed_flipper_coef_;
@@ -75,6 +76,7 @@ private:
 
   // CAN Com Functions
   int CanSetDuty(int MotorID, float Duty);
+
 };
 
 }  // namespace canrover

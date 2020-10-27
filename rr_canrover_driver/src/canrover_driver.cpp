@@ -66,14 +66,14 @@ namespace canrover
     if (!(nh_priv_.getParam("device", device_)))
       ROS_WARN("Failed to retrieve can device name from parameter server.Defaulting to %s", device_.c_str());
     //Check if motor 1 and 2 address are actually vescs
-    if (!(nh_priv_.getParam("left_vescid", LEFT_MOTOR_ID)))
+    if (!(nh_priv_.getParam("left_vescid", LEFT_MOTOR_ID_)))
       ROS_WARN("Failed to retrieve left vesc id from parameter. Defaulting to 1");
-    if (!(nh_priv_.getParam("left_vescid", RIGHT_MOTOR_ID)))
+    if (!(nh_priv_.getParam("left_vescid", RIGHT_MOTOR_ID_)))
       ROS_WARN("Failed to retrieve left vesc id from parameter. Defaulting to 1");
     ROS_INFO("Openrover parameters loaded:");
     ROS_INFO("device: %s", device_.c_str());
-    ROS_INFO("vesc_id for left motor: %f", LEFT_MOTOR_ID);
-    ROS_INFO("vesc_id for right motor: %f", RIGHT_MOTOR_ID);
+    ROS_INFO("vesc_id for left motor: %f", LEFT_MOTOR_ID_);
+    ROS_INFO("vesc_id for right motor: %f", RIGHT_MOTOR_ID_);
 
     return true;
   }
@@ -121,7 +121,7 @@ namespace canrover
     struct can_frame frame;
     struct ifreq ifr;
 
-    const char *ifname = device_;
+    const char *ifname = device_.c_str();
 
     if ((s = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0)
     {
@@ -141,10 +141,10 @@ namespace canrover
     {
       perror("Error in socket bind");
       return -2;
-    }
-    Duty = clip(Duty, -1.0, 1.0)
-        int32_t v = static_cast<int32_t>(Duty * 100000.0);
-    frame.can_id = LEFT_MOTOR_ID | 0x80000000U;
+    } 
+    Duty = clip(Duty, -1.0, 1.0);
+    int32_t v = static_cast<int32_t>(Duty * 100000.0);
+    frame.can_id = MotorID | 0x80000000U;
     frame.can_dlc = 4;
     frame.data[0] = static_cast<uint8_t>((static_cast<uint32_t>(v) >> 24) & 0xFF);
     frame.data[1] = static_cast<uint8_t>((static_cast<uint32_t>(v) >> 16) & 0xFF);
