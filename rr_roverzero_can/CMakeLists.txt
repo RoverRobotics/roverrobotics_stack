@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(rr_openrover_driver)
+project(rr_canrover_driver)
 
 add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
@@ -33,7 +33,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(zerocan_driver_node src/openrover_driver.cpp)
+add_executable(canrover_driver_node src/canrover_driver.cpp)
 
 
 #############
@@ -41,7 +41,7 @@ add_executable(zerocan_driver_node src/openrover_driver.cpp)
 #############
 
 ## Mark executables and/or libraries for installation
-install(TARGETS zerocan_driver_node
+install(TARGETS canrover_driver_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
