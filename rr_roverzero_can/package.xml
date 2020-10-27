@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>zerocan_driver</name>
+  <version>1.1.1</version>
+  <description>
+    Rover Zero VESC CAN driver
+  </description>
+
+  <maintainer email="will@roverrobotics.com">William Rook</maintainer>
+
+  <license>BSD</license>
+  
+  <author>William Rook</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>tf2</depend>
+
+  <depend>roscpp</depend>
+  <depend>rospy</depend>
+
+  <build_depend>message_generation</build_depend>
+  <build_depend>tf2_geometry_msgs</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>twist_mux</exec_depend>
+  <exec_depend>joy</exec_depend>
+
+</package>
