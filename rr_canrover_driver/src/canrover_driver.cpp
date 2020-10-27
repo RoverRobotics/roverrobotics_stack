@@ -31,7 +31,7 @@
 #include <std_msgs/Bool.h>
 #include "nav_msgs/Odometry.h"
 
-// #include "rr_openrover_driver/openrover.hpp"
+#include "canrover.hpp"
 namespace canrover
 {
   CanRover::CanRover(ros::NodeHandle &nh, ros::NodeHandle &nh_priv) : nh_(nh),
@@ -55,10 +55,10 @@ namespace canrover
     }
 
     ROS_INFO("Successfuly setup robot parameters");
-    cmd_vel_sub = nh_priv_.subscribe("/cmd_vel/managed", 1, &OpenRover::cmdVelCB, this);
-    fan_speed_sub = nh_priv_.subscribe("/rr_openrover_driver/fan_speed", 1, &OpenRover::fanSpeedCB, this);
-    e_stop_sub = nh_priv_.subscribe("/soft_estop/enable", 1, &OpenRover::eStopCB, this);
-    e_stop_reset_sub = nh_priv_.subscribe("/soft_estop/reset", 1, &OpenRover::eStopResetCB, this);
+    cmd_vel_sub = nh_priv_.subscribe("/cmd_vel/managed", 1, &CanRover::cmdVelCB, this);
+    fan_speed_sub = nh_priv_.subscribe("/rr_canrover_driver/fan_speed", 1, &CanRover::fanSpeedCB, this);
+    e_stop_sub = nh_priv_.subscribe("/soft_estop/enable", 1, &CanRover::eStopCB, this);
+    e_stop_reset_sub = nh_priv_.subscribe("/soft_estop/reset", 1, &CanRover::eStopResetCB, this);
     return true;
   }
   bool CanRover::verifyParams()
@@ -113,7 +113,7 @@ namespace canrover
     }
     return;
   }
-  void CanRover::CanSetDuty(int MotorID, float Duty)
+  int CanRover::CanSetDuty(int MotorID, float Duty)
   {
     int s;
     int nbytes;
@@ -142,22 +142,44 @@ namespace canrover
       perror("Error in socket bind");
       return -2;
     }
-    Duty = clip(Duty,-1.0,1.0)
-    int32_t v = static_cast<int32_t>(Duty * 100000.0);
-    frame.can_id = LEFT_MOTOR_ID | 0x80000000U; 
-    frame.can_dlc = 4; 
+    Duty = clip(Duty, -1.0, 1.0)
+        int32_t v = static_cast<int32_t>(Duty * 100000.0);
+    frame.can_id = LEFT_MOTOR_ID | 0x80000000U;
+    frame.can_dlc = 4;
     frame.data[0] = static_cast<uint8_t>((static_cast<uint32_t>(v) >> 24) & 0xFF);
     frame.data[1] = static_cast<uint8_t>((static_cast<uint32_t>(v) >> 16) & 0xFF);
     frame.data[2] = static_cast<uint8_t>((static_cast<uint32_t>(v) >> 8) & 0xFF);
-    frame.data[3] = static_cast<uint8_t>(static_cast<uint32_t>(v)& 0xFF);
+    frame.data[3] = static_cast<uint8_t>(static_cast<uint32_t>(v) & 0xFF);
     nbytes = write(s, &frame, sizeof(struct can_frame));
 
     printf("Wrote %d bytes\n", nbytes);
   }
-  float clip(float n, float lower, float upper)
+  float CanRover::clip(float n, float lower, float upper)
   {
     return std::max(lower, std::min(n, upper));
   }
+  void CanRover::eStopCB(const std_msgs::Bool::ConstPtr &msg)
+  {
+    static bool prev_e_stop_state_ = false;
+
+    // e-stop only trigger on the rising edge of the signal and only deactivates when reset
+    if (msg->data && !prev_e_stop_state_)
+    {
+      e_stop_on_ = true;
+    }
+
+    prev_e_stop_state_ = msg->data;
+    return;
+  }
+  void CanRover::eStopResetCB(const std_msgs::Bool::ConstPtr &msg)
+  {
+    if (msg->data)
+    {
+      e_stop_on_ = false;
+    }
+    return;
+  }
+
 } // namespace canrover
 
 int main(int argc, char *argv[])
@@ -180,7 +202,7 @@ int main(int argc, char *argv[])
                   ros::shutdown( );
                   return -2;
           }
-          if( !openrover )
+          if( !canrover )
           {
                   ROS_FATAL( "Failed to initialize driver" );
                   delete nh_priv;
@@ -195,7 +217,7 @@ int main(int argc, char *argv[])
     ros::requestShutdown();
   }
   /*
-          delete openrover;
+          delete canrover;
           delete nh_priv;
           delete nh;
   */
