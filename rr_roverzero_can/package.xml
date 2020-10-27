@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>canrover_driver</name>
+  <name>rr_canrover_driver</name>
   <version>1.1.1</version>
   <description>
     Rover Zero VESC CAN driver
