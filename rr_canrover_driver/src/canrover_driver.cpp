@@ -37,8 +37,6 @@ namespace canrover
   CanRover::CanRover(ros::NodeHandle &nh, ros::NodeHandle &nh_priv) : nh_(nh),
                                                                       nh_priv_(nh_priv),
                                                                       device_("can0"),
-                                                                      left_vel_commanded_(0),
-                                                                      right_vel_commanded_(0),
                                                                       e_stop_on_(false),
                                                                       LEFT_MOTOR_ID(1),
                                                                       RIGHT_MOTOR_ID(2)
@@ -50,7 +48,7 @@ namespace canrover
   {
     if (!verifyParams())
     {
-      RPS_WARN("Failed to setup ROBOT parameters.");
+      ROS_WARN("Failed to setup ROBOT parameters.");
       return false;
     }
 
@@ -66,14 +64,14 @@ namespace canrover
     if (!(nh_priv_.getParam("device", device_)))
       ROS_WARN("Failed to retrieve can device name from parameter server.Defaulting to %s", device_.c_str());
     //Check if motor 1 and 2 address are actually vescs
-    if (!(nh_priv_.getParam("left_vescid", LEFT_MOTOR_ID_)))
-      ROS_WARN("Failed to retrieve left vesc id from parameter. Defaulting to 1");
-    if (!(nh_priv_.getParam("left_vescid", RIGHT_MOTOR_ID_)))
-      ROS_WARN("Failed to retrieve left vesc id from parameter. Defaulting to 1");
-    ROS_INFO("Openrover parameters loaded:");
-    ROS_INFO("device: %s", device_.c_str());
-    ROS_INFO("vesc_id for left motor: %f", LEFT_MOTOR_ID_);
-    ROS_INFO("vesc_id for right motor: %f", RIGHT_MOTOR_ID_);
+    // if (!(nh_priv_.getParam("left_vescid", LEFT_MOTOR_ID_)))
+    //   ROS_WARN("Failed to retrieve left vesc id from parameter. Defaulting to 1");
+    // if (!(nh_priv_.getParam("left_vescid", RIGHT_MOTOR_ID_)))
+    //   ROS_WARN("Failed to retrieve left vesc id from parameter. Defaulting to 1");
+    // ROS_INFO("Openrover parameters loaded:");
+    // ROS_INFO("device: %s", device_.c_str());
+    // ROS_INFO("vesc_id for left motor: %f", LEFT_MOTOR_ID_);
+    // ROS_INFO("vesc_id for right motor: %f", RIGHT_MOTOR_ID_);
 
     return true;
   }
