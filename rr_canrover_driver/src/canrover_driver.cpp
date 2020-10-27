@@ -142,7 +142,7 @@ namespace canrover
       perror("Error in socket bind");
       return -2;
     }
-    Duty = clip(duty,-1.0,1.0)
+    Duty = clip(Duty,-1.0,1.0)
     int32_t v = static_cast<int32_t>(Duty * 100000.0);
     frame.can_id = LEFT_MOTOR_ID | 0x80000000U; 
     frame.can_dlc = 4; 
