@@ -53,7 +53,7 @@ namespace canrover
       return false;
     }
 
-    *iframe = device_.c_str();
+    ifname = device_.c_str();
 
     if ((s = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0)
     {
