@@ -108,7 +108,7 @@ namespace canrover
 
     // double diff_vel_commanded = turn_rate / odom_angular_coef_ / odom_traction_factor_;
 
-    CanSetDuty(LEFT_MOTOR_ID_, linear_rate + 0.5 );//* diff_vel_commanded);
+    CanSetDuty(LEFT_MOTOR_ID_, linear_rate + 0.5 );// * diff_vel_commanded);
     CanSetDuty(RIGHT_MOTOR_ID_, linear_rate - 0.5);// * diff_vel_commanded);
 
     if (e_stop_on_)
@@ -209,6 +209,8 @@ int main(int argc, char *argv[])
     ROS_FATAL("Failed to start the can driver");
     ros::requestShutdown();
   }
+  ros::spin();
+  ros::waitForShutdown();
   /*
           delete canrover;
           delete nh_priv;
