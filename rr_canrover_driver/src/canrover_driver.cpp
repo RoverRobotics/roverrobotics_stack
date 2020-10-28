@@ -134,9 +134,9 @@ namespace canrover
   }
   int CanRover::CanSetDuty(int MotorID, float Duty)
   {
-    ROS_INFO("receiving DUTY %f" , Duty);
+   // ROS_INFO("receiving DUTY %f" , Duty);
     Duty = clip(Duty, -1.0, 1.0);
-    ROS_INFO("trimmed DUTY %f", Duty);
+   // ROS_INFO("trimmed DUTY %f", Duty);
     int32_t v = static_cast<int32_t>(Duty * 100000.0);
     frame.can_id = MotorID | 0x80000000U;
     frame.can_dlc = 4;
@@ -146,7 +146,7 @@ namespace canrover
     frame.data[3] = static_cast<uint8_t>(static_cast<uint32_t>(v) & 0xFF);
     nbytes = write(s, &frame, sizeof(struct can_frame));
 
-    printf("Wrote %d bytes\n", nbytes);
+   // printf("Wrote %d bytes\n", nbytes);
   }
   float CanRover::clip(float n, float lower, float upper)
   {
