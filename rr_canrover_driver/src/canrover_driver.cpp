@@ -46,12 +46,34 @@ namespace canrover
 
   bool CanRover::start()
   {
+    
     if (!verifyParams())
     {
       ROS_WARN("Failed to setup ROBOT parameters.");
       return false;
     }
 
+    *iframe = device_.c_str();
+
+    if ((s = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0)
+    {
+      ROS_ERROR("Error while opening socket");
+      return -1;
+    }
+
+    strcpy(ifr.ifr_name, ifname);
+    ioctl(s, SIOCGIFINDEX, &ifr);
+
+    addr.can_family = AF_CAN;
+    addr.can_ifindex = ifr.ifr_ifindex;
+
+    printf("%s at index %d\n", ifname, ifr.ifr_ifindex);
+
+    if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+    {
+      ROS_ERROR("Error in socket bind");
+      return -2;
+    } 
     ROS_INFO("Successfuly setup robot parameters");
     cmd_vel_sub = nh_priv_.subscribe("/cmd_vel/managed", 1, &CanRover::cmdVelCB, this);
     e_stop_sub = nh_priv_.subscribe("/soft_estop/enable", 1, &CanRover::eStopCB, this);
@@ -112,33 +134,7 @@ namespace canrover
   }
   int CanRover::CanSetDuty(int MotorID, float Duty)
   {
-    int s;
-    int nbytes;
-    struct sockaddr_can addr;
-    struct can_frame frame;
-    struct ifreq ifr;
-
-    const char *ifname = device_.c_str();
-
-    if ((s = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0)
-    {
-      perror("Error while opening socket");
-      return -1;
-    }
-
-    strcpy(ifr.ifr_name, ifname);
-    ioctl(s, SIOCGIFINDEX, &ifr);
-
-    addr.can_family = AF_CAN;
-    addr.can_ifindex = ifr.ifr_ifindex;
-
-    printf("%s at index %d\n", ifname, ifr.ifr_ifindex);
-
-    if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0)
-    {
-      perror("Error in socket bind");
-      return -2;
-    } 
+    
     Duty = clip(Duty, -1.0, 1.0);
     int32_t v = static_cast<int32_t>(Duty * 100000.0);
     frame.can_id = MotorID | 0x80000000U;

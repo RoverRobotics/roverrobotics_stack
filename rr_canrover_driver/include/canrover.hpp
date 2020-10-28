@@ -33,50 +33,54 @@
 
 namespace canrover
 {
-class CanRover
-{
-public:
-  CanRover(ros::NodeHandle& nh, ros::NodeHandle& nh_priv);
-  bool start();
-  bool verifyParams();
-  void serialManager();
-  bool e_stop_on_;
-  float clip(float n, float lower, float upper);
+  class CanRover
+  {
+  public:
+    CanRover(ros::NodeHandle &nh, ros::NodeHandle &nh_priv);
+    bool start();
+    bool verifyParams();
+    void serialManager();
+    bool e_stop_on_;
+    float clip(float n, float lower, float upper);
 
-private:
-  // ROS Parameters
-  std::string device_;
-  std::string drive_type_;
+  private:
+    // ROS Parameters
+    std::string device_;
+    std::string drive_type_;
 
-  float timeout_;  // Default to neutral motor values after timeout seconds
+    float timeout_; // Default to neutral motor values after timeout seconds
 
-  // ROS node handlers
-  ros::NodeHandle& nh_;
-  ros::NodeHandle& nh_priv_;
+    // ROS node handlers
+    ros::NodeHandle &nh_;
+    ros::NodeHandle &nh_priv_;
 
-  ros::Subscriber cmd_vel_sub;
-  ros::Subscriber e_stop_sub;
-  ros::Subscriber e_stop_reset_sub;
+    ros::Subscriber cmd_vel_sub;
+    ros::Subscriber e_stop_sub;
+    ros::Subscriber e_stop_reset_sub;
 
-  const int LEFT_MOTOR_ID_;
-  const int RIGHT_MOTOR_ID_;
-  const int MOTOR_NEUTRAL = 0;
-  int motor_speed_linear_coef_;
-  int motor_speed_angular_coef_;
-  int motor_speed_flipper_coef_;
-  int motor_speed_deadband_;
+    const int LEFT_MOTOR_ID_;
+    const int RIGHT_MOTOR_ID_;
+    const int MOTOR_NEUTRAL = 0;
+    int motor_speed_linear_coef_;
+    int motor_speed_angular_coef_;
+    int motor_speed_flipper_coef_;
+    int motor_speed_deadband_;
+    int s;
+    int nbytes;
+    struct sockaddr_can addr;
+    struct can_frame frame;
+    struct ifreq ifr;
+    const char *ifname;
+    // int motor_speed_diff_max_; ---WIP
+    geometry_msgs::Twist cmd_vel_commanded_;
 
-  // int motor_speed_diff_max_; ---WIP
-  geometry_msgs::Twist cmd_vel_commanded_;
+    // ROS Subscriber callback functions
+    void cmdVelCB(const geometry_msgs::Twist::ConstPtr &msg);
+    void eStopCB(const std_msgs::Bool::ConstPtr &msg);
+    void eStopResetCB(const std_msgs::Bool::ConstPtr &msg);
 
-  // ROS Subscriber callback functions
-  void cmdVelCB(const geometry_msgs::Twist::ConstPtr& msg);
-  void eStopCB(const std_msgs::Bool::ConstPtr& msg);
-  void eStopResetCB(const std_msgs::Bool::ConstPtr& msg);
+    // CAN Com Functions
+    int CanSetDuty(int MotorID, float Duty);
+  };
 
-  // CAN Com Functions
-  int CanSetDuty(int MotorID, float Duty);
-
-};
-
-}  // namespace canrover
+} // namespace canrover
