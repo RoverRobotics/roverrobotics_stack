@@ -84,29 +84,12 @@ namespace canrover
   {
     if (!(nh_priv_.getParam("device", device_)))
       ROS_WARN("Failed to retrieve can device name from parameter server.Defaulting to %s", device_.c_str());
-    //Check if motor 1 and 2 address are actually vescs
-    // if (!(nh_priv_.getParam("left_vescid", LEFT_MOTOR_ID_)))
-    //   ROS_WARN("Failed to retrieve left vesc id from parameter. Defaulting to 1");
-    // if (!(nh_priv_.getParam("left_vescid", RIGHT_MOTOR_ID_)))
-    //   ROS_WARN("Failed to retrieve left vesc id from parameter. Defaulting to 1");
-    // ROS_INFO("Openrover parameters loaded:");
-    // ROS_INFO("device: %s", device_.c_str());
-    // ROS_INFO("vesc_id for left motor: %f", LEFT_MOTOR_ID_);
-    // ROS_INFO("vesc_id for right motor: %f", RIGHT_MOTOR_ID_);
-
     return true;
   }
   void CanRover::cmdVelCB(const geometry_msgs::Twist::ConstPtr &msg)
   {
-    // converts from cmd_vel (m/s and radians/s) into motor speed commands
-    cmd_vel_commanded_ = *msg;
-    float left_motor_speed, right_motor_speed;
-    int motor_speed_deadband_scaled;
-    double turn_rate = msg->angular.z;
-    double linear_rate = msg->linear.x;
     static bool prev_e_stop_state_ = false;
-
-    double diff_vel_commanded = turn_rate; // / odom_angular_coef_ / odom_traction_factor_;
+    double diff_vel_commanded = turn_rate;
     if (e_stop_on_)
     {
       if (!prev_e_stop_state_)
@@ -125,8 +108,8 @@ namespace canrover
         prev_e_stop_state_ = false;
         ROS_INFO("Rover driver - Soft e-stop off.");
       }
-      CanSetDuty(LEFT_MOTOR_ID_, linear_rate + 0.5 * diff_vel_commanded);
-      CanSetDuty(RIGHT_MOTOR_ID_, linear_rate - 0.5 * diff_vel_commanded);
+      CanSetDuty(LEFT_MOTOR_ID_, msg->linear.x + 0.5 * msg->angular.z);
+      CanSetDuty(RIGHT_MOTOR_ID_, msg->linear.x - 0.5 * msg->angular.z);
     }
     return;
   }
