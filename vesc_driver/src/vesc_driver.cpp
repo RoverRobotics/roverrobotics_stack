@@ -21,8 +21,6 @@ VescDriver::VescDriver(ros::NodeHandle nh,
         boost::bind(&VescDriver::vescPacketCallback, this, _1),
         boost::bind(&VescDriver::vescErrorCallback, this, _1)),
   duty_cycle_limit_(private_nh, "duty_cycle", -1.0, 1.0), current_limit_(private_nh, "current"),
-  brake_limit_(private_nh, "brake"), speed_limit_(private_nh, "speed"),
-  position_limit_(private_nh, "position"), servo_limit_(private_nh, "servo", 0.0, 1.0),
   driver_mode_(MODE_INITIALIZING), fw_version_major_(-1), fw_version_minor_(-1)
 {
   // get vesc serial port address
@@ -183,58 +181,6 @@ void VescDriver::dutyCycleCallback(const std_msgs::Float64::ConstPtr& duty_cycle
 {
   if (driver_mode_ = MODE_OPERATING) {
     vesc_.setDutyCycle(duty_cycle_limit_.clip(duty_cycle->data));
-  }
-}
-
-/**
- * @param current Commanded VESC current in Amps. Any value is accepted by this driver. However,
- *                note that the VESC may impose a more restrictive bounds on the range depending on
- *                its configuration.
- */
-void VescDriver::currentCallback(const std_msgs::Float64::ConstPtr& current)
-{
-  if (driver_mode_ = MODE_OPERATING) {
-    vesc_.setCurrent(current_limit_.clip(current->data));
-  }
-}
-
-/**
- * @param brake Commanded VESC braking current in Amps. Any value is accepted by this driver.
- *              However, note that the VESC may impose a more restrictive bounds on the range
- *              depending on its configuration.
- */
-void VescDriver::brakeCallback(const std_msgs::Float64::ConstPtr& brake)
-{
-  if (driver_mode_ = MODE_OPERATING) {
-    vesc_.setBrake(brake_limit_.clip(brake->data));
-  }
-}
-
-/**
- * @param speed Commanded VESC speed in electrical RPM. Electrical RPM is the mechanical RPM
- *              multiplied by the number of motor poles. Any value is accepted by this
- *              driver. However, note that the VESC may impose a more restrictive bounds on the
- *              range depending on its configuration.
- */
-void VescDriver::speedCallback(const std_msgs::Float64::ConstPtr& speed)
-{
-  if (driver_mode_ = MODE_OPERATING) {
-    vesc_.setSpeed(speed_limit_.clip(speed->data));
-  }
-}
-
-/**
- * @param servo Commanded VESC servo output position. Valid range is 0 to 1.
- */
-void VescDriver::servoCallback(const std_msgs::Float64::ConstPtr& servo)
-{
-  if (driver_mode_ = MODE_OPERATING) {
-    double servo_clipped(servo_limit_.clip(servo->data));
-    vesc_.setServo(servo_clipped);
-    // publish clipped servo value as a "sensor"
-    std_msgs::Float64::Ptr servo_sensor_msg(new std_msgs::Float64);
-    servo_sensor_msg->data = servo_clipped;
-    servo_sensor_pub_.publish(servo_sensor_msg);
   }
 }
 
