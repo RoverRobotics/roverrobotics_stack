@@ -135,7 +135,7 @@ namespace canrover
   int CanRover::CanSetDuty(int MotorID, float Duty)
   {
    // ROS_INFO("receiving DUTY %f" , Duty);
-    Duty = clip(Duty, -1.0, 1.0);
+    Duty = clip(Duty, -0.5, 0.5);
    // ROS_INFO("trimmed DUTY %f", Duty);
     int32_t v = static_cast<int32_t>(Duty * 100000.0);
     frame.can_id = MotorID | 0x80000000U;
