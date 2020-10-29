@@ -107,10 +107,6 @@ namespace canrover
     static bool prev_e_stop_state_ = false;
 
     double diff_vel_commanded = turn_rate; // / odom_angular_coef_ / odom_traction_factor_;
-
-    CanSetDuty(LEFT_MOTOR_ID_, linear_rate + 0.5 * diff_vel_commanded);
-    CanSetDuty(RIGHT_MOTOR_ID_, linear_rate - 0.5 * diff_vel_commanded);
-
     if (e_stop_on_)
     {
       if (!prev_e_stop_state_)
@@ -129,6 +125,8 @@ namespace canrover
         prev_e_stop_state_ = false;
         ROS_INFO("Rover driver - Soft e-stop off.");
       }
+      CanSetDuty(LEFT_MOTOR_ID_, linear_rate + 0.5 * diff_vel_commanded);
+      CanSetDuty(RIGHT_MOTOR_ID_, linear_rate - 0.5 * diff_vel_commanded);
     }
     return;
   }
