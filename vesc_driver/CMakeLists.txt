@@ -36,17 +36,6 @@ target_link_libraries(vesc_driver_node
   ${catkin_LIBRARIES}
 )
 
-# nodelet library
-add_library(vesc_driver_nodelet src/vesc_driver_nodelet.cpp
-                                src/vesc_driver.cpp
-                                src/vesc_interface.cpp
-                                src/vesc_packet.cpp
-                                src/vesc_packet_factory.cpp)
-add_dependencies(vesc_driver_nodelet ${catkin_EXPORTED_TARGETS})
-target_link_libraries(vesc_driver_nodelet
-  ${catkin_LIBRARIES}
-)
-
 #############
 ## Install ##
 #############

@@ -59,10 +59,6 @@ VescDriver::VescDriver(ros::NodeHandle nh,
   // create vesc state (telemetry) publisher
   state_pub_ = nh.advertise<vesc_msgs::VescStateStamped>("sensors/core", 10);
 
-  // since vesc state does not include the servo position, publish the commanded
-  // servo position as a "sensor"
-  servo_sensor_pub_ = nh.advertise<std_msgs::Float64>("sensors/servo_position_command", 10);
-
   // subscribe to motor and servo command topics
   // duty_cycle_sub_ = nh.subscribe("commands/motor/duty_cycle", 10,
   //                                &VescDriver::dutyCycleCallback, this);
@@ -224,19 +220,6 @@ void VescDriver::speedCallback(const std_msgs::Float64::ConstPtr& speed)
 {
   if (driver_mode_ = MODE_OPERATING) {
     vesc_.setSpeed(speed_limit_.clip(speed->data));
-  }
-}
-
-/**
- * @param position Commanded VESC motor position in radians. Any value is accepted by this driver.
- *                 Note that the VESC must be in encoder mode for this command to have an effect.
- */
-void VescDriver::positionCallback(const std_msgs::Float64::ConstPtr& position)
-{
-  if (driver_mode_ = MODE_OPERATING) {
-    // ROS uses radians but VESC seems to use degrees. Convert to degrees.
-    double position_deg = position_limit_.clip(position->data) * 180.0 / M_PI;
-    vesc_.setPosition(position_deg);
   }
 }
 
