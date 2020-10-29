@@ -1,11 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>rr_openrover_stack</name>
-<<<<<<< HEAD
-  <version>1.0.1</version>
-=======
-  <version>1.1.1</version>
->>>>>>> upstream/melodic_with_v2support
+<version>1.1.1</version>
   <description>
     Packages related to the operation of Rover Robotics rover hardware.  This includes a client
     for interfacing with the hardware (rr_openrover_driver) and a tool for filtering time stamped
