@@ -19,8 +19,4 @@
   <depend>std_msgs</depend>
   <depend>python_orocos_kdl</depend>
   <depend>python-serial</depend>
-<<<<<<< HEAD
 </package>
-=======
-</package>
->>>>>>> upstream/melodic_with_v2support
