@@ -29,19 +29,6 @@ private:
   void vescPacketCallback(const boost::shared_ptr<VescPacket const>& packet);
   void vescErrorCallback(const std::string& error);
 
-  // limits on VESC commands
-  struct CommandLimit
-  {
-    CommandLimit(const ros::NodeHandle& nh, const std::string& str,
-                 const boost::optional<double>& min_lower = boost::optional<double>(),
-                 const boost::optional<double>& max_upper = boost::optional<double>());
-    double clip(double value);
-    std::string name;
-    boost::optional<double> lower;
-    boost::optional<double> upper;
-  };
-  CommandLimit duty_cycle_limit_;
-
   // ROS services
   ros::Publisher state_pub_;
   ros::Subscriber twist_sub_;
@@ -60,10 +47,8 @@ private:
 
   // ROS callbacks
   void timerCallback(const ros::TimerEvent& event);
-  void dutyCycleCallback(const std_msgs::Float64::ConstPtr& duty_cycle);
   void callbackTwist(const geometry_msgs::Twist &msg);
-  double left_twist_to_power(double linear_rate, double angular_rate);
-  double right_twist_to_power(double linear_rate, double angular_rate);
+  float clip(float n, float lower, float upper);
 };
 
 } // namespace vesc_driver
