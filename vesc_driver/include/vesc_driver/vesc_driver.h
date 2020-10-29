@@ -7,6 +7,7 @@
 
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
+#include <std_msgs/Bool.h>
 #include <boost/optional.hpp>
 #include "geometry_msgs/Twist.h"
 
@@ -22,7 +23,7 @@ public:
 
   VescDriver(ros::NodeHandle nh,
              ros::NodeHandle private_nh);
-
+  bool e_stop_on_;
 private:
   // interface to the VESC
   VescInterface vesc_;
@@ -32,6 +33,8 @@ private:
   // ROS services
   ros::Publisher state_pub_;
   ros::Subscriber twist_sub_;
+  ros::Subscriber e_stop_sub;
+  ros::Subscriber e_stop_reset_sub;
   ros::Timer timer_;
 
   // driver modes (possible states)
@@ -48,6 +51,8 @@ private:
   // ROS callbacks
   void timerCallback(const ros::TimerEvent& event);
   void callbackTwist(const geometry_msgs::Twist &msg);
+  void eStopCB(const std_msgs::Bool::ConstPtr &msg);
+  void eStopResetCB(const std_msgs::Bool::ConstPtr &msg);
   float clip(float n, float lower, float upper);
 };
 

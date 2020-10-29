@@ -16,12 +16,12 @@ namespace vesc_driver
 {
 
 VescDriver::VescDriver(ros::NodeHandle nh,
-                       ros::NodeHandle private_nh) :
+                       ros::NodeHandle private_nh):
   vesc_(std::string(),
         boost::bind(&VescDriver::vescPacketCallback, this, _1),
         boost::bind(&VescDriver::vescErrorCallback, this, _1)),
-  duty_cycle_limit_(private_nh, "duty_cycle", -1.0, 1.0), current_limit_(private_nh, "current"),
-  driver_mode_(MODE_INITIALIZING), fw_version_major_(-1), fw_version_minor_(-1)
+  driver_mode_(MODE_INITIALIZING), fw_version_major_(-1), fw_version_minor_(-1),
+  e_stop_on_(false)
 {
   // get vesc serial port address
   std::string port;
@@ -49,8 +49,9 @@ VescDriver::VescDriver(ros::NodeHandle nh,
 
   // create vesc state (telemetry) publisher
   state_pub_ = nh.advertise<vesc_msgs::VescStateStamped>("sensors/core", 10);
-	  
-  twist_sub_ = nh.subscribe("/cmd_vel/", 10, &VescDriver::callbackTwist, this);
+  e_stop_sub = nh.subscribe("/soft_estop/enable", 1, &VescDriver::eStopCB, this);
+  e_stop_reset_sub = nh.subscribe("/soft_estop/reset", 1, &VescDriver::eStopResetCB, this);
+  twist_sub_ = nh.subscribe("/cmd_vel/", 1, &VescDriver::callbackTwist, this);
 
   // create a 50Hz timer, used for state machine & polling VESC telemetry
   timer_ = nh.createTimer(ros::Duration(1.0/50.0), &VescDriver::timerCallback, this);
@@ -129,8 +130,9 @@ void VescDriver::vescErrorCallback(const std::string& error)
 }
 
 void VescDriver::callbackTwist(const geometry_msgs::Twist &msg) {
-        if (driver_mode_ = MODE_OPERATING) {
-	if (e_stop_on_)
+	static bool prev_e_stop_state_ = false;
+    if (driver_mode_ == MODE_OPERATING) {	
+    if (e_stop_on_)
     {
       if (!prev_e_stop_state_)
       {
@@ -148,8 +150,8 @@ void VescDriver::callbackTwist(const geometry_msgs::Twist &msg) {
         prev_e_stop_state_ = false;
         ROS_INFO("Rover driver - Soft e-stop off.");
       }
-      vesc_.setDutyCycle(clip(msg.linear.x + 0.5 * msg.angular.z, -0.5, 0.5));
-      vesc_.setDutyCycle(clip(msg.linear.x - 0.5 * msg.angular.z, -0.5 , 0.5), 8);
+      vesc_.setDutyCycle(clip(msg.linear.x - 0.5 * msg.angular.z, -0.5, 0.5));
+      vesc_.setDutyCycle(clip(msg.linear.x + 0.5 * msg.angular.z, -0.5 , 0.5), 8);
     }	
         }
 }
@@ -157,6 +159,28 @@ void VescDriver::callbackTwist(const geometry_msgs::Twist &msg) {
  float VescDriver::clip(float n, float lower, float upper)
   {
     return std::max(lower, std::min(n, upper));
+  }
+
+void VescDriver::eStopCB(const std_msgs::Bool::ConstPtr &msg)
+  {
+    static bool prev_e_stop_state_ = false;
+
+    // e-stop only trigger on the rising edge of the signal and only deactivates when reset
+    if (msg->data && !prev_e_stop_state_)
+    {
+      e_stop_on_ = true;
+    }
+
+    prev_e_stop_state_ = msg->data;
+    return;
+  }
+  void VescDriver::eStopResetCB(const std_msgs::Bool::ConstPtr &msg)
+  {
+    if (msg->data)
+    {
+      e_stop_on_ = false;
+    }
+    return;
   }
 
 
