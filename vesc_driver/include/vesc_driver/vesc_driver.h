@@ -41,21 +41,9 @@ private:
     boost::optional<double> upper;
   };
   CommandLimit duty_cycle_limit_;
-  CommandLimit current_limit_;
-  CommandLimit brake_limit_;
-  CommandLimit speed_limit_;
-  CommandLimit position_limit_;
-  CommandLimit servo_limit_;
 
   // ROS services
   ros::Publisher state_pub_;
-  ros::Publisher servo_sensor_pub_;
-  ros::Subscriber duty_cycle_sub_;
-  ros::Subscriber current_sub_;
-  ros::Subscriber brake_sub_;
-  ros::Subscriber speed_sub_;
-  ros::Subscriber position_sub_;
-  ros::Subscriber servo_sub_;
   ros::Subscriber twist_sub_;
   ros::Timer timer_;
 
@@ -73,11 +61,6 @@ private:
   // ROS callbacks
   void timerCallback(const ros::TimerEvent& event);
   void dutyCycleCallback(const std_msgs::Float64::ConstPtr& duty_cycle);
-  void currentCallback(const std_msgs::Float64::ConstPtr& current);
-  void brakeCallback(const std_msgs::Float64::ConstPtr& brake);
-  void speedCallback(const std_msgs::Float64::ConstPtr& speed);
-  void positionCallback(const std_msgs::Float64::ConstPtr& position);
-  void servoCallback(const std_msgs::Float64::ConstPtr& servo);
   void callbackTwist(const geometry_msgs::Twist &msg);
   double left_twist_to_power(double linear_rate, double angular_rate);
   double right_twist_to_power(double linear_rate, double angular_rate);
