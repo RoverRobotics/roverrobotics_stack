@@ -23,7 +23,7 @@ VescDriver::VescDriver(ros::NodeHandle nh,
   driver_mode_(MODE_INITIALIZING), fw_version_major_(-1), fw_version_minor_(-1),
   e_stop_on_(false)
 {
-  // get vesc serial port address
+   // get vesc serial port address
   std::string port;
   if (!private_nh.getParam("port", port)) {
     ROS_FATAL("VESC communication port parameter required.");
@@ -37,14 +37,8 @@ VescDriver::VescDriver(ros::NodeHandle nh,
   }
   catch (SerialException e) {
     ROS_FATAL("Failed to connect to the VESC, %s.", e.what());
-    ROS_INFO("Retrying Every 1 Second");
-    while(!vesc_.isConnected()){
-	sleep(1000);
-	ROS_INFO("...");
-	vesc_.connect(port);
-    }
-    //ros::shutdown();
-    //return;
+    ros::shutdown();
+    return;
   }
 
   // create vesc state (telemetry) publisher
@@ -96,11 +90,10 @@ void VescDriver::vescPacketCallback(const boost::shared_ptr<VescPacket const>& p
   if (packet->name() == "Values") {
     boost::shared_ptr<VescPacketValues const> values =
       boost::dynamic_pointer_cast<VescPacketValues const>(packet);
-
+    //TODO: Add other missing params
     vesc_msgs::VescStateStamped::Ptr state_msg(new vesc_msgs::VescStateStamped);
     state_msg->header.stamp = ros::Time::now();
     state_msg->state.voltage_input = values->v_in();
-    state_msg->state.temperature_pcb = values->temp_pcb();
     state_msg->state.current_motor = values->current_motor();
     state_msg->state.current_input = values->current_in();
     state_msg->state.speed = values->rpm();
