@@ -124,6 +124,7 @@ class VescPacketRequestValues : public VescPacket
 {
 public:
   VescPacketRequestValues();
+  VescPacketRequestValues(int canid);
 };
 
 /*------------------------------------------------------------------------------------------------*/

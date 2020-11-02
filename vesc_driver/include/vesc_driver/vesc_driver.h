@@ -47,6 +47,7 @@ private:
   driver_mode_t driver_mode_;           ///< driver state machine mode (state)
   int fw_version_major_;                ///< firmware major version reported by vesc
   int fw_version_minor_;                ///< firmware minor version reported by vesc
+  int id = 0;
 
   // ROS callbacks
   void timerCallback(const ros::TimerEvent& event);

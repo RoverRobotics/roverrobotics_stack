@@ -85,6 +85,7 @@ public:
 
   void requestFWVersion();
   void requestState();
+  void requestState(int canid);
   void setDutyCycle(double duty_cycle);
   void setDutyCycle(double duty_cycle,int m2_address);
   void setCurrent(double current);

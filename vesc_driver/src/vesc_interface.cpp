@@ -214,6 +214,10 @@ void VescInterface::requestState()
   send(VescPacketRequestValues());
 }
 
+void VescInterface::requestState(int canid){
+  send(VescPacketRequestValues(canid));
+}
+
 void VescInterface::setDutyCycle(double duty_cycle)
 {
   send(VescPacketSetDuty(duty_cycle));

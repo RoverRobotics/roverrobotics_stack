@@ -77,7 +77,13 @@ void VescDriver::timerCallback(const ros::TimerEvent& event)
   }
   else if (driver_mode_ == MODE_OPERATING) {
     // poll for vesc state (telemetry)
-    vesc_.requestState();
+    if (id == 0){
+      vesc_.requestState();
+      id = 1;
+    }else if (id == 1){
+      vesc_.requestState(8);
+      id = 0;
+    }
   }
   else {
     // unknown mode, how did that happen?
@@ -93,6 +99,7 @@ void VescDriver::vescPacketCallback(const boost::shared_ptr<VescPacket const>& p
     //TODO: Add other missing params
     vesc_msgs::VescStateStamped::Ptr state_msg(new vesc_msgs::VescStateStamped);
     state_msg->header.stamp = ros::Time::now();
+    state_msg->state.id = id;
     state_msg->state.voltage_input = values->v_in();
     state_msg->state.current_motor = values->current_motor();
     state_msg->state.current_input = values->current_in();
