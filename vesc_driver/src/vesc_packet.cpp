@@ -231,42 +231,42 @@ namespace vesc_driver
 
   uint VescPacketValues::vesc_id() const //uint 8
   {
-    return static_cast<uint>(*(payload_.first + 56));
+    return static_cast<uint>(*(payload_.first + 58));
   }
   double VescPacketValues::temp_mos_1() const //double 16 1e1
-  {
-    int16_t v = static_cast<int16_t>((static_cast<uint16_t>(*(payload_.first + 57)) << 8) +
-                                     static_cast<uint16_t>(*(payload_.first + 58)));
-    return static_cast<double>(v) / 10.0;
-  }
-
-  double VescPacketValues::temp_mos_2() const //double 16 1e1
   {
     int16_t v = static_cast<int16_t>((static_cast<uint16_t>(*(payload_.first + 59)) << 8) +
                                      static_cast<uint16_t>(*(payload_.first + 60)));
     return static_cast<double>(v) / 10.0;
   }
-  double VescPacketValues::temp_mos_3() const //double 16 1e1
+
+  double VescPacketValues::temp_mos_2() const //double 16 1e1
   {
     int16_t v = static_cast<int16_t>((static_cast<uint16_t>(*(payload_.first + 61)) << 8) +
                                      static_cast<uint16_t>(*(payload_.first + 62)));
     return static_cast<double>(v) / 10.0;
   }
+  double VescPacketValues::temp_mos_3() const //double 16 1e1
+  {
+    int16_t v = static_cast<int16_t>((static_cast<uint16_t>(*(payload_.first + 63)) << 8) +
+                                     static_cast<uint16_t>(*(payload_.first + 64)));
+    return static_cast<double>(v) / 10.0;
+  }
 
   double VescPacketValues::vd() const //double32 1e3
   {
-    int32_t v = static_cast<int32_t>((static_cast<uint32_t>(*(payload_.first + 63)) << 24) +
-                                     (static_cast<uint32_t>(*(payload_.first + 64)) << 16) +
-                                     (static_cast<uint32_t>(*(payload_.first + 65)) << 8) +
-                                     static_cast<uint32_t>(*(payload_.first + 66)));
+    int32_t v = static_cast<int32_t>((static_cast<uint32_t>(*(payload_.first + 65)) << 24) +
+                                     (static_cast<uint32_t>(*(payload_.first + 66)) << 16) +
+                                     (static_cast<uint32_t>(*(payload_.first + 67)) << 8) +
+                                     static_cast<uint32_t>(*(payload_.first + 68)));
     return static_cast<double>(v) / 1000.0;
   }
   double VescPacketValues::vq() const //double32 1e3
   {
-    int32_t v = static_cast<int32_t>((static_cast<uint32_t>(*(payload_.first + 67)) << 24) +
-                                     (static_cast<uint32_t>(*(payload_.first + 68)) << 16) +
-                                     (static_cast<uint32_t>(*(payload_.first + 69)) << 8) +
-                                     static_cast<uint32_t>(*(payload_.first + 70)));
+    int32_t v = static_cast<int32_t>((static_cast<uint32_t>(*(payload_.first + 69)) << 24) +
+                                     (static_cast<uint32_t>(*(payload_.first + 70)) << 16) +
+                                     (static_cast<uint32_t>(*(payload_.first + 71)) << 8) +
+                                     static_cast<uint32_t>(*(payload_.first + 72)));
     return static_cast<double>(v) / 1000.0;
   }
 

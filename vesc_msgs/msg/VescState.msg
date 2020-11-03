@@ -25,8 +25,9 @@ float64 watt_hours
 float64 watt_hours_charged
 int32 tachometer   
 int32 tachometer_abs
+int32   fault_code
 float64 position  
-uint8   fault_code
+uint32  vesc_id
 float64 temp_mos_1
 float64 temp_mos_2
 float64 temp_mos_3

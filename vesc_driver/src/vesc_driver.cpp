@@ -130,6 +130,7 @@ namespace vesc_driver
       state_msg->state.tachometer_abs = values->tachometer_abs();
       state_msg->state.fault_code = values->fault_code();
       state_msg->state.position = values->position();
+      state_msg->state.vesc_id = values->vesc_id();
       state_msg->state.temp_mos_1 = values->temp_mos_1();
       state_msg->state.temp_mos_2 = values->temp_mos_2();
       state_msg->state.temp_mos_3 = values->temp_mos_3();
