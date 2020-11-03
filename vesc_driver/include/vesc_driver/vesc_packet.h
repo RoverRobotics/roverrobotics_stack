@@ -100,7 +100,6 @@ class VescPacketValues : public VescPacket
 {
 public:
   VescPacketValues(boost::shared_ptr<VescFrame> raw);
-
   double temp_mos() const;
   double temp_motor() const;
   double current_motor() const;
@@ -114,9 +113,16 @@ public:
   double amp_hours_charged() const;
   double watt_hours() const;
   double watt_hours_charged() const;
-  double tachometer() const;
-  double tachometer_abs() const;
+  int tachometer() const;
+  int tachometer_abs() const;
   int fault_code() const;
+  double position() const;
+  uint vesc_id() const;
+  double temp_mos_1() const;
+  double temp_mos_2() const;
+  double temp_mos_3() const;
+  double vd() const;
+  double vq() const;
 
 };
 
@@ -124,7 +130,7 @@ class VescPacketRequestValues : public VescPacket
 {
 public:
   VescPacketRequestValues();
-  VescPacketRequestValues(int canid);
+  VescPacketRequestValues(int id);
 };
 
 /*------------------------------------------------------------------------------------------------*/
@@ -191,3 +197,4 @@ public:
 } // namespace vesc_driver
 
 #endif // VESC_DRIVER_VESC_PACKET_H_
+ 

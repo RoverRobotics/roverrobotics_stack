@@ -32,6 +32,7 @@ private:
 
   // ROS services
   ros::Publisher state_pub_;
+  ros::Publisher state2_pub_;
   ros::Subscriber twist_sub_;
   ros::Subscriber e_stop_sub;
   ros::Subscriber e_stop_reset_sub;
