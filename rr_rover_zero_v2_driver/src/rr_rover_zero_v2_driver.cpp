@@ -1,24 +1,24 @@
 // -*- mode:c++; fill-column: 100; -*-
 
-#include "vesc_driver/vesc_driver.h"
+#include "rr_rover_zero_v2_driver/rr_rover_zero_v2_driver.h"
 
 #include <cassert>
 #include <cmath>
 #include <sstream>
 
 #include <boost/bind.hpp>
-#include <vesc_msgs/VescStateStamped.h>
+#include <rr_rover_zero_v2_driver_msgs/VescStateStamped.h>
 
 const double wheel_base = 0.358775;
 const double wheel_radius = 0.127;
 
-namespace vesc_driver
+namespace rr_rover_zero_v2_driver
 {
 
-  VescDriver::VescDriver(ros::NodeHandle nh,
+  Rr_Rover_ZERO_V2_Driver::Rr_Rover_ZERO_V2_Driver(ros::NodeHandle nh,
                          ros::NodeHandle private_nh) : vesc_(std::string(),
-                                                             boost::bind(&VescDriver::vescPacketCallback, this, _1),
-                                                             boost::bind(&VescDriver::vescErrorCallback, this, _1)),
+                                                             boost::bind(&Rr_Rover_ZERO_V2_Driver::vescPacketCallback, this, _1),
+                                                             boost::bind(&Rr_Rover_ZERO_V2_Driver::vescErrorCallback, this, _1)),
                                                        driver_mode_(MODE_INITIALIZING), fw_version_major_(-1), fw_version_minor_(-1),
                                                        e_stop_on_(false)
   {
@@ -44,17 +44,17 @@ namespace vesc_driver
     }
 
     // create vesc state (telemetry) publisher
-    state_pub_ = nh.advertise<vesc_msgs::VescStateStamped>("sensors_1", 1);
-    state2_pub_ = nh.advertise<vesc_msgs::VescStateStamped>("sensors_2", 1);
-    e_stop_sub = nh.subscribe("/soft_estop/enable", 1, &VescDriver::eStopCB, this);
-    e_stop_reset_sub = nh.subscribe("/soft_estop/reset", 1, &VescDriver::eStopResetCB, this);
-    twist_sub_ = nh.subscribe("/cmd_vel/", 1, &VescDriver::callbackTwist, this);
+    state_pub_ = nh.advertise<rr_rover_zero_v2_driver_msgs::VescStateStamped>("sensors_1", 1);
+    state2_pub_ = nh.advertise<rr_rover_zero_v2_driver_msgs::VescStateStamped>("sensors_2", 1);
+    e_stop_sub = nh.subscribe("/soft_estop/enable", 1, &Rr_Rover_ZERO_V2_Driver::eStopCB, this);
+    e_stop_reset_sub = nh.subscribe("/soft_estop/reset", 1, &Rr_Rover_ZERO_V2_Driver::eStopResetCB, this);
+    twist_sub_ = nh.subscribe("/cmd_vel/", 1, &Rr_Rover_ZERO_V2_Driver::callbackTwist, this);
 
     // create a 50Hz timer, used for state machine & polling VESC telemetry
-    timer_ = nh.createTimer(ros::Duration(1.0 / 50.0), &VescDriver::timerCallback, this);
+    timer_ = nh.createTimer(ros::Duration(1.0 / 50.0), &Rr_Rover_ZERO_V2_Driver::timerCallback, this);
   }
 
-  void VescDriver::timerCallback(const ros::TimerEvent &event)
+  void Rr_Rover_ZERO_V2_Driver::timerCallback(const ros::TimerEvent &event)
   {
     // VESC interface should not unexpectedly disconnect, but test for it anyway
     if (!vesc_.isConnected())
@@ -102,14 +102,14 @@ namespace vesc_driver
     }
   }
 
-  void VescDriver::vescPacketCallback(const boost::shared_ptr<VescPacket const> &packet)
+  void Rr_Rover_ZERO_V2_Driver::vescPacketCallback(const boost::shared_ptr<VescPacket const> &packet)
   {
     if (packet->name() == "Values")
     {
       boost::shared_ptr<VescPacketValues const> values =
           boost::dynamic_pointer_cast<VescPacketValues const>(packet);
       //TODO: Add other missing params
-      vesc_msgs::VescStateStamped::Ptr state_msg(new vesc_msgs::VescStateStamped);
+      rr_rover_zero_v2_driver_msgs::VescStateStamped::Ptr state_msg(new rr_rover_zero_v2_driver_msgs::VescStateStamped);
       //TODO: fix variable naming!!!!!
       state_msg->header.stamp = ros::Time::now();
       state_msg->state.motorid = id;
@@ -158,12 +158,12 @@ namespace vesc_driver
     }
   }
 
-  void VescDriver::vescErrorCallback(const std::string &error)
+  void Rr_Rover_ZERO_V2_Driver::vescErrorCallback(const std::string &error)
   {
     ROS_ERROR("%s", error.c_str());
   }
 
-  void VescDriver::callbackTwist(const geometry_msgs::Twist &msg)
+  void Rr_Rover_ZERO_V2_Driver::callbackTwist(const geometry_msgs::Twist &msg)
   {
     static bool prev_e_stop_state_ = false;
     if (driver_mode_ == MODE_OPERATING)
@@ -192,12 +192,12 @@ namespace vesc_driver
     }
   }
 
-  float VescDriver::clip(float n, float lower, float upper)
+  float Rr_Rover_ZERO_V2_Driver::clip(float n, float lower, float upper)
   {
     return std::max(lower, std::min(n, upper));
   }
 
-  void VescDriver::eStopCB(const std_msgs::Bool::ConstPtr &msg)
+  void Rr_Rover_ZERO_V2_Driver::eStopCB(const std_msgs::Bool::ConstPtr &msg)
   {
     static bool prev_e_stop_state_ = false;
 
@@ -210,7 +210,7 @@ namespace vesc_driver
     prev_e_stop_state_ = msg->data;
     return;
   }
-  void VescDriver::eStopResetCB(const std_msgs::Bool::ConstPtr &msg)
+  void Rr_Rover_ZERO_V2_Driver::eStopResetCB(const std_msgs::Bool::ConstPtr &msg)
   {
     if (msg->data)
     {
@@ -219,4 +219,4 @@ namespace vesc_driver
     return;
   }
 
-} // namespace vesc_driver
+} // namespace rr_rover_zero_v2_driver

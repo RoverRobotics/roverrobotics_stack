@@ -13,9 +13,9 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "vesc_driver/vesc_packet.h"
+#include "rr_rover_zero_v2_driver/vesc_packet.h"
 
-namespace vesc_driver
+namespace rr_rover_zero_v2_driver
 {
 
 /**
@@ -119,6 +119,6 @@ public:
   }
 };
 
-} // namespace vesc_driver
+} // namespace rr_rover_zero_v2_driver
 
-#endif // VESC_DRIVER_VESC_INTERFACE_H_
+#endif // rr_rover_zero_v2_driver_VESC_INTERFACE_H_

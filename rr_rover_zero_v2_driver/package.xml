@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package>
+  <name>rr_rover_zero_v2_driver</name>
+  <version>1.0.0</version>
+  <description>
+    ROS Driver for Flip Sky Vesc with Dual Motors
+  </description>
+
+  <maintainer email="will@roverrobotics.com">William Rook</maintainer>
+  <author email="will@roverrobotics.com">William Rook</author>
+  <license>BSD</license>
+  
+  <url type="website">http://www.ros.org/wiki/rr_rover_zero_v2_driver</url>
+  <url type="repository">https://github.com/roverrobotics/rr_openrover_stack</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>pluginlib</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>rr_rover_zero_v2_driver_msgs</build_depend>
+  <build_depend>serial</build_depend>
+
+  <run_depend>nodelet</run_depend>
+  <run_depend>pluginlib</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>rr_rover_zero_v2_driver_msgs</run_depend>
+  <run_depend>serial</run_depend>
+</package>

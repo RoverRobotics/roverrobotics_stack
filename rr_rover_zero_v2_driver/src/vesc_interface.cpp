@@ -1,6 +1,6 @@
 // -*- mode:c++; fill-column: 100; -*-
 
-#include "vesc_driver/vesc_interface.h"
+#include "rr_rover_zero_v2_driver/vesc_interface.h"
 
 #include <pthread.h>
 
@@ -12,9 +12,9 @@
 #include <serial/serial.h>
 #include <boost/crc.hpp>
 
-#include "vesc_driver/vesc_packet_factory.h"
+#include "rr_rover_zero_v2_driver/vesc_packet_factory.h"
 
-namespace vesc_driver
+namespace rr_rover_zero_v2_driver
 {
 
 class VescInterface::Impl
@@ -253,4 +253,4 @@ void VescInterface::setServo(double servo)
   send(VescPacketSetServoPos(servo));
 }
 
-} // namespace vesc_driver
+} // namespace rr_rover_zero_v2_driver

@@ -1,18 +1,18 @@
 <launch>
-    <arg name="config_locks"  default="$(find vesc_driver)/config/twist_mux_locks.yaml"/>
-    <arg name="config_topics" default="$(find vesc_driver)/config/twist_mux_topics.yaml"/>
-<arg name="node_name" default="vesc_driver_node" />
+    <arg name="config_locks"  default="$(find rr_rover_zero_v2_driver)/config/twist_mux_locks.yaml"/>
+    <arg name="config_topics" default="$(find rr_rover_zero_v2_driver)/config/twist_mux_topics.yaml"/>
+<arg name="node_name" default="rr_rover_zero_v2_driver_node" />
 
   <!-- Optionally launch in GDB, for debugging -->
   <arg name="debug" default="false" />
   <arg if="$(arg debug)" name="launch_prefix" value="xterm -e gdb --args" />
   <arg unless="$(arg debug)" name="launch_prefix" value="" />
 
-  <!-- VESC driver parameters -->
+  <!-- driver parameters -->
   <arg name="port" default="/dev/rover-zero-v2" />
   <arg name="canaddress" default="8" />
-  <!-- VESC driver node -->
-  <node pkg="vesc_driver" type="vesc_driver_node" name="$(arg node_name)"
+  <!-- driver node -->
+  <node pkg="rr_rover_zero_v2_driver" type="rr_rover_zero_v2_driver_node" name="$(arg node_name)"
         output="screen" launch-prefix="$(arg launch_prefix)" >
     <param name="port" value="$(arg port)" />
     <remap from="/cmd_vel" to="/cmd_vel/managed" />
@@ -41,7 +41,7 @@
 
   <!-- PS4 Mapper -->
   <node pkg="rr_control_input_manager" type="ps4_mapper.py" name="ps4_mapper" output="screen" >
-      <rosparam command="load" file="$(find vesc_driver)/config/ps4_controller_config.yaml" />
+      <rosparam command="load" file="$(find rr_rover_zero_v2_driver)/config/ps4_controller_config.yaml" />
       <param name="stamped" value="True" />
   </node>
 

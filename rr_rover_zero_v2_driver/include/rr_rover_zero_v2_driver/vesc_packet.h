@@ -10,9 +10,9 @@
 #include <boost/crc.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "vesc_driver/v8stdint.h"
+#include "rr_rover_zero_v2_driver/v8stdint.h"
 
-namespace vesc_driver
+namespace rr_rover_zero_v2_driver
 {
 
 typedef std::vector<uint8_t> Buffer;
@@ -194,7 +194,7 @@ public:
   //  double servo_pos() const;
 };
 
-} // namespace vesc_driver
+} // namespace rr_rover_zero_v2_driver
 
 #endif // VESC_DRIVER_VESC_PACKET_H_
  

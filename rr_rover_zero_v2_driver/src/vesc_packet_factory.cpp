@@ -1,6 +1,6 @@
 // -*- mode:c++; fill-column: 100; -*-
 
-#include "vesc_driver/vesc_packet_factory.h"
+#include "rr_rover_zero_v2_driver/vesc_packet_factory.h"
 
 #include <cassert>
 #include <iterator>
@@ -9,9 +9,9 @@
 #include <boost/range/distance.hpp>
 #include <boost/range/end.hpp>
 
-#include "vesc_driver/vesc_packet.h"
+#include "rr_rover_zero_v2_driver/vesc_packet.h"
 
-namespace vesc_driver
+namespace rr_rover_zero_v2_driver
 {
 
 /** Construct map on first use */
@@ -121,4 +121,4 @@ VescPacketPtr VescPacketFactory::createPacket(const Buffer::const_iterator& begi
 }
 
 
-} // namesapce vesc_driver
+} // namesapce rr_rover_zero_v2_driver
