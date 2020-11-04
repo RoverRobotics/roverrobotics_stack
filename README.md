@@ -81,20 +81,20 @@ Your Robot can now be control via our Launch Files. *** These are template launc
 
 Rover Pro:
 ```bash
-roslaunch rr_openrover_driver teleop_launch
+roslaunch rr_openrover_driver teleop.launch
 ```
 Rover Pro with slam pack:
 ```bash
-roslaunch rr_openrover_driver slampack_launch
+roslaunch rr_openrover_driver slampack.launch
 ```
 
 Rover Zero:
 ```bash
-roslaunch rr_roverzero_driver teleop_launch
+roslaunch rr_roverzero_driver teleop.launch
 ```
 Rover Zero V2:
 ```bash
-roslaunch vesc_driver vesc_driver_node.launch
+roslaunch rr_rover_zero_v2_driver teleop.launch
 ```
 # Other Installation
 
