@@ -2,19 +2,6 @@
 Changelog for package rr_control_input_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-<<<<<<< HEAD
-1.0.1 (2020-06-15)
-------------------
-
-=======
-1.1.1 (2020-06-15)
-------------------
-
-1.1.0 (2020-06-08)
-------------------
-* release to melodic
-
->>>>>>> upstream/melodic_with_v2support
 1.0.0 (2020-06-08)
 ------------------
 * adding support for freedom robotics and add watchdog timer to rover zero driver
