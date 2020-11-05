@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(vesc_msgs)
+project(rr_rover_zero_v2_driver_msgs)
 
 find_package(catkin REQUIRED COMPONENTS
   std_msgs

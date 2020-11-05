@@ -1,0 +1,37 @@
+<launch>
+    <arg name="config_locks"  default="$(find rr_canrover_driver)/config/twist_mux_locks.yaml"/>
+    <arg name="config_topics" default="$(find rr_canrover_driver)/config/twist_mux_topics.yaml"/>
+    <!-- CanRover Driver -->
+    <node pkg="rr_canrover_driver" type="rr_canrover_driver_node" name="canrover" respawn="false" output="screen">
+        <param name="device" value="can0" />
+    </node>
+
+    <!--  Twist Mux  -->
+    <node pkg="twist_mux" type="twist_mux" name="twist_mux" output="screen">
+        <remap from="cmd_vel_out" to="/cmd_vel/managed"/>
+
+        <rosparam file="$(arg config_locks)"  command="load"/>
+        <rosparam file="$(arg config_topics)" command="load"/>
+    </node>
+
+    <!-- Control input manager -->
+    <node pkg="rr_control_input_manager" type="control_input_manager.py" name="rr_control_input_manager_node" output="log" >
+        <param name="driver" value="xboxdrv"/>
+        <param name="wired_or_wireless" value="wireless"/>
+        <rosparam file="$(find rr_control_input_manager)/config/input_topics.yaml" command="load"/>
+    </node>
+
+     <!-- PS4 Ubuntu Driver -->
+    <node pkg="ds4_driver" type="ds4_driver_node.py" name="ds4_driver" output="screen" >
+	<rosparam command="load" file="$(find rr_canrover_driver)/config/ps4_driver_config.yaml" />
+	<param name="device_addr" value="" />
+	<param name="use_standard_msgs" value="false" />
+	<param name="autorepeat_rate" value="0" />
+    </node>
+ 
+    <!-- PS4 Mapper -->
+    <node pkg="rr_control_input_manager" type="ps4_mapper.py" name="ps4_mapper" output="screen" >
+        <rosparam command="load" file="$(find rr_canrover_driver)/config/ps4_controller_config.yaml" />
+        <param name="stamped" value="True" />
+    </node>
+</launch>

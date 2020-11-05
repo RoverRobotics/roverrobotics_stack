@@ -11,10 +11,10 @@
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "vesc_driver/v8stdint.h"
-#include "vesc_driver/vesc_packet.h"
+#include "rr_rover_zero_v2_driver/v8stdint.h"
+#include "rr_rover_zero_v2_driver/vesc_packet.h"
 
-namespace vesc_driver
+namespace rr_rover_zero_v2_driver
 {
 
 /**
@@ -77,6 +77,6 @@ public: \
 }; \
 static klass##Factory global_##klass##Factory;
 
-} // namespace vesc_driver
+} // namespace rr_rover_zero_v2_driver
 
-#endif // VESC_DRIVER_VESC_PACKET_FACTORY_H_
+#endif 

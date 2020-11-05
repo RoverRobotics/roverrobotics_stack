@@ -1,18 +1,17 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(vesc_driver)
+project(rr_rover_zero_v2_driver)
 
 find_package(catkin REQUIRED COMPONENTS
-  nodelet
   pluginlib
   roscpp
   std_msgs
-  vesc_msgs
+  rr_rover_zero_v2_driver_msgs
   serial
 )
 
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS nodelet pluginlib roscpp std_msgs vesc_msgs serial
+  CATKIN_DEPENDS pluginlib roscpp std_msgs rr_rover_zero_v2_driver_msgs serial
 )
 
 ###########
@@ -26,13 +25,13 @@ include_directories(
 )
 
 # node executable
-add_executable(vesc_driver_node src/vesc_driver_node.cpp
-                                src/vesc_driver.cpp
+add_executable(rr_rover_zero_v2_driver_node src/rr_rover_zero_v2_driver_node.cpp
+                                src/rr_rover_zero_v2_driver.cpp
                                 src/vesc_interface.cpp
                                 src/vesc_packet.cpp
                                 src/vesc_packet_factory.cpp)
-add_dependencies(vesc_driver_node ${catkin_EXPORTED_TARGETS})
-target_link_libraries(vesc_driver_node
+add_dependencies(rr_rover_zero_v2_driver_node ${catkin_EXPORTED_TARGETS})
+target_link_libraries(rr_rover_zero_v2_driver_node
   ${catkin_LIBRARIES}
 )
 
@@ -40,14 +39,12 @@ target_link_libraries(vesc_driver_node
 ## Install ##
 #############
 
-install(TARGETS vesc_driver_node
+install(TARGETS rr_rover_zero_v2_driver_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
-install(FILES vesc_driver_nodelet.xml
-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 install(DIRECTORY launch/
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
 

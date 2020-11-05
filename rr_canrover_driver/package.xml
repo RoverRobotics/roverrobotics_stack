@@ -1,19 +1,16 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>rr_openrover_driver</name>
-<version>1.1.1</version>
+  <name>rr_canrover_driver</name>
+  <version>1.1.1</version>
   <description>
-    Provides an interface between ros and Rover Robotics rover hardware. Inputs to rr_openrover_driver
-    include emergency stop and velocity commands.  It outputs diagnostic data such as encoder
-    readings and battery charge.
+    Rover Zero VESC CAN driver
   </description>
 
-  <maintainer email="nickpadilla@roverrobotics.com">Nick Padilla</maintainer>
+  <maintainer email="will@roverrobotics.com">William Rook</maintainer>
 
   <license>BSD</license>
-
-  <url>http://ros.org/wiki/rr_openrover_driver</url>
-  <author>Jack Kilian</author>
+  
+  <author>William Rook</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
@@ -27,11 +24,9 @@
   <depend>rospy</depend>
 
   <build_depend>message_generation</build_depend>
-  <build_depend>rr_openrover_driver_msgs</build_depend>
   <build_depend>tf2_geometry_msgs</build_depend>
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>twist_mux</exec_depend>
   <exec_depend>joy</exec_depend>
-  <exec_depend>rr_openrover_driver_msgs</exec_depend>
 
 </package>

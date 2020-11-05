@@ -7,6 +7,9 @@ find_package(catkin REQUIRED COMPONENTS
   diagnostic_msgs
   nav_msgs
   std_msgs
+  geometry_msgs
+  diagnostic_msgs
+  nav_msgs
 )
 
 catkin_python_setup()
