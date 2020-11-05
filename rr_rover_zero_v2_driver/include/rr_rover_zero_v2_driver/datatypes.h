@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <string>
 
 // Data types
 typedef enum {
@@ -583,25 +584,30 @@ typedef enum {
 } MOTE_PACKET;
 
 typedef struct {
-    float v_in;
-    float temp_mos1;
-    float temp_mos2;
-    float temp_mos3;
-    float temp_mos4;
-    float temp_mos5;
-    float temp_mos6;
-    float temp_pcb;
-    float current_motor;
-    float current_in;
-    float rpm;
-    float duty_now;
-    float amp_hours;
-    float amp_hours_charged;
-    float watt_hours;
-    float watt_hours_charged;
+    double v_in;
+    double temp_mos1;
+    double temp_mos2;
+    double  temp_mos3;
+    double  temp_motor;
+    double current_motor;
+    double current_in;
+    double  id;
+    double iq;
+    double rpm;
+    double duty_now;
+    double amp_hours;
+    double amp_hours_charged;
+    double watt_hours;
+    double watt_hours_charged;
     int tachometer;
     int tachometer_abs;
+    double position;
     mc_fault_code fault_code;
+    int vesc_id;
+    std::string fault_str;
+    double vd;
+    double vq;
+
 } mc_values;
 
 typedef enum {
