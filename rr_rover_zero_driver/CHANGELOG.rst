@@ -2,13 +2,6 @@
 Changelog for package rr_rover_zero_driver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-<<<<<<< HEAD
-1.0.1 (2020-06-15)
-------------------
-* fixing kdl call
-* push dependency fix
-* Contributors: Nick Fragale, padiln
-=======
 1.1.1 (2020-06-15)
 ------------------
 * correct find_packge for rover zero cmakelists
@@ -21,7 +14,6 @@ Changelog for package rr_rover_zero_driver
 1.1.0 (2020-06-08)
 ------------------
 * release to melodic
->>>>>>> upstream/melodic_with_v2support
 
 1.0.0 (2020-06-08)
 ------------------

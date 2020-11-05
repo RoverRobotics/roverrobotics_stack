@@ -2,11 +2,6 @@
 Changelog for package rr_openrover_driver_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-<<<<<<< HEAD
-1.0.1 (2020-06-15)
-------------------
-
-=======
 1.1.1 (2020-06-15)
 ------------------
 
@@ -14,7 +9,6 @@ Changelog for package rr_openrover_driver_msgs
 ------------------
 * release to melodic
 
->>>>>>> upstream/melodic_with_v2support
 1.0.0 (2020-06-08)
 ------------------
 * Contributors: padiln
