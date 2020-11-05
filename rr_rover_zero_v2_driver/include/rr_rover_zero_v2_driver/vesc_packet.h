@@ -10,9 +10,9 @@
 #include <boost/crc.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "vesc_driver/v8stdint.h"
+#include "rr_rover_zero_v2_driver/v8stdint.h"
 
-namespace vesc_driver
+namespace rr_rover_zero_v2_driver
 {
 
 typedef std::vector<uint8_t> Buffer;
@@ -100,26 +100,29 @@ class VescPacketValues : public VescPacket
 {
 public:
   VescPacketValues(boost::shared_ptr<VescFrame> raw);
-
-  double v_in() const;
-  double temp_mos1() const;
-  double temp_mos2() const;
-  double temp_mos3() const;
-  double temp_mos4() const;
-  double temp_mos5() const;
-  double temp_mos6() const;
-  double temp_pcb() const;
+  double temp_mos() const;
+  double temp_motor() const;
   double current_motor() const;
   double current_in() const;
-  double rpm() const;
+  double id() const;
+  double iq() const;
   double duty_now() const;
+  double rpm() const;
+  double v_in() const;
   double amp_hours() const;
   double amp_hours_charged() const;
   double watt_hours() const;
   double watt_hours_charged() const;
-  double tachometer() const;
-  double tachometer_abs() const;
+  int tachometer() const;
+  int tachometer_abs() const;
   int fault_code() const;
+  double position() const;
+  uint vesc_id() const;
+  double temp_mos_1() const;
+  double temp_mos_2() const;
+  double temp_mos_3() const;
+  double vd() const;
+  double vq() const;
 
 };
 
@@ -127,6 +130,7 @@ class VescPacketRequestValues : public VescPacket
 {
 public:
   VescPacketRequestValues();
+  VescPacketRequestValues(int id);
 };
 
 /*------------------------------------------------------------------------------------------------*/
@@ -190,6 +194,7 @@ public:
   //  double servo_pos() const;
 };
 
-} // namespace vesc_driver
+} // namespace rr_rover_zero_v2_driver
 
 #endif // VESC_DRIVER_VESC_PACKET_H_
+ 
