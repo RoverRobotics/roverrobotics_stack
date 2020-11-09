@@ -89,7 +89,7 @@ namespace canrover
   void CanRover::cmdVelCB(const geometry_msgs::Twist::ConstPtr &msg)
   {
     static bool prev_e_stop_state_ = false;
-    double diff_vel_commanded = turn_rate;
+    double diff_vel_commanded = msg->angular.z;
     if (e_stop_on_)
     {
       if (!prev_e_stop_state_)
