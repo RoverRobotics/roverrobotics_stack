@@ -10,11 +10,13 @@
 #include <iostream>
 #include <sys/ioctl.h>
 
+#include <sensor_msgs/Joy.h>
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "std_msgs/Int32.h"
 #include "std_msgs/Int32MultiArray.h"
 #include "std_msgs/Float32MultiArray.h"
+#include "std_msgs/Float32.h"
 #include "geometry_msgs/Twist.h"
 #include <std_msgs/Bool.h>
 #include "nav_msgs/Odometry.h"
@@ -94,7 +96,6 @@ bool OpenRover::start()
   slow_timer = nh_priv_.createWallTimer(ros::WallDuration(1.0 / slow_rate_hz_), &OpenRover::robotDataSlowCB, this);
   timeout_timer = nh_priv_.createWallTimer(ros::WallDuration(timeout_), &OpenRover::timeoutCB, this, true);
 
-
   if (!(nh_priv_.getParam("use_legacy", use_legacy_)))
   {
     ROS_WARN("Failed to retrieve drive_type from parameter.Defaulting to %s", use_legacy_ ? "true" : "false");
@@ -117,11 +118,12 @@ bool OpenRover::start()
   motor_speeds_pub = nh_priv_.advertise<std_msgs::Int32MultiArray>("motor_speeds_commanded", 1);
   vel_calc_pub = nh_priv_.advertise<std_msgs::Float32MultiArray>("vel_calc_pub", 1);
 
+  trim_sub = nh_priv_.subscribe("/trim_increment", 1, &OpenRover::trimCB, this);
   cmd_vel_sub = nh_priv_.subscribe("/cmd_vel/managed", 1, &OpenRover::cmdVelCB, this);
   fan_speed_sub = nh_priv_.subscribe("/rr_openrover_driver/fan_speed", 1, &OpenRover::fanSpeedCB, this);
   e_stop_sub = nh_priv_.subscribe("/soft_estop/enable", 1, &OpenRover::eStopCB, this);
   e_stop_reset_sub = nh_priv_.subscribe("/soft_estop/reset", 1, &OpenRover::eStopResetCB, this);
-
+  trim = 0;
   return true;
 }
 
@@ -377,7 +379,7 @@ void OpenRover::timeoutCB(const ros::WallTimerEvent& e)
   return;
 }
 
-void OpenRover::fanSpeedCB(const std_msgs::Int32::ConstPtr& msg)
+void OpenRover::fanSpeedCB(const  std_msgs::Int32::ConstPtr& msg)
 {
   if (is_serial_coms_open_ && (serial_fan_buffer_.size() == 0))
   {
@@ -387,8 +389,13 @@ void OpenRover::fanSpeedCB(const std_msgs::Int32::ConstPtr& msg)
   return;
 }
 
-void OpenRover::cmdVelCB(const geometry_msgs::Twist::ConstPtr& msg)
-{  // converts from cmd_vel (m/s and radians/s) into motor speed commands
+void OpenRover::trimCB(const std_msgs::Float32::ConstPtr& msg){
+//Get trim_increment value
+  trim+= msg->data;
+  ROS_INFO("Trim value is at %f", trim);
+}
+
+void OpenRover::cmdVelCB(const geometry_msgs::Twist::ConstPtr& msg){  // converts from cmd_vel (m/s and radians/s) into motor speed commands
   cmd_vel_commanded_ = *msg;
   float left_motor_speed, right_motor_speed;
   int flipper_motor_speed;
@@ -396,6 +403,14 @@ void OpenRover::cmdVelCB(const geometry_msgs::Twist::ConstPtr& msg)
   double turn_rate = msg->angular.z;
   double linear_rate = msg->linear.x;
   double flipper_rate = msg->angular.y;
+  if (turn_rate == 0){
+    if(linear_rate > 0){
+      turn_rate = trim;
+    }
+    else if(linear_rate <0){
+      turn_rate = -trim;
+    }
+  }
   static bool prev_e_stop_state_ = false;
 
   double diff_vel_commanded = turn_rate / odom_angular_coef_ / odom_traction_factor_;
@@ -763,9 +778,9 @@ void OpenRover::serialManager()
       updateMeasuredVelocities();  // Update openrover measured velocities based on latest encoder readings
 
       motor_speeds_commanded_[LEFT_MOTOR_INDEX_] =
-          left_controller_.run(e_stop_on_, closed_loop_control_on_, left_vel_commanded_, left_vel_measured_, dt);
+          left_controller_.run(e_stop_on_, closed_loop_control_on_, left_vel_commanded_, left_vel_measured_, dt, robot_data_[i_BUILDNO]);
       motor_speeds_commanded_[RIGHT_MOTOR_INDEX_] =
-          right_controller_.run(e_stop_on_, closed_loop_control_on_, right_vel_commanded_, right_vel_measured_, dt);
+          right_controller_.run(e_stop_on_, closed_loop_control_on_, right_vel_commanded_, right_vel_measured_, dt, robot_data_[i_BUILDNO]);
 
       left_vel_filtered_ = left_controller_.velocity_filtered_;
       right_vel_filtered_ = right_controller_.velocity_filtered_;
@@ -807,45 +822,84 @@ void OpenRover::serialManager()
 
 void OpenRover::updateMeasuredVelocities()
 {
-  int left_enc = robot_data_[i_ENCODER_INTERVAL_MOTOR_LEFT];
-  int right_enc = robot_data_[i_ENCODER_INTERVAL_MOTOR_RIGHT];
+  
+  int robotFirmwareBuild = robot_data_[i_BUILDNO];
 
-  // Bound left_encoder readings to range of normal operation.
-  if (left_enc < ENCODER_MIN)
-  {
-    left_vel_measured_ = 0;
-  }
-  else if (left_enc > ENCODER_MAX)
-  {
-    left_vel_measured_ = 0;
-  }
-  else if (motor_speeds_commanded_[LEFT_MOTOR_INDEX_] > MOTOR_NEUTRAL)  // this sets direction of measured
-  {
-    left_vel_measured_ = odom_encoder_coef_ / left_enc;
-  }
-  else
-  {
-    left_vel_measured_ = -odom_encoder_coef_ / left_enc;
-  }
+  if(robotFirmwareBuild == BUILD_NUMBER_WITH_GOOD_RPM_DATA){
+    signed short int left_rpm = robot_data_[i_REG_MOTOR_FB_RPM_LEFT];
+    signed short int right_rpm = robot_data_[i_REG_MOTOR_FB_RPM_RIGHT];
 
-  // Bound right_encoder readings to range of normal operation.
-  if (right_enc < ENCODER_MIN)
-  {
-    right_vel_measured_ = 0;
-  }
-  else if (right_enc > ENCODER_MAX)
-  {
-    right_vel_measured_ = 0;
-  }
-  else if (motor_speeds_commanded_[RIGHT_MOTOR_INDEX_] > MOTOR_NEUTRAL)  // this sets direction of measured
-  {
-    right_vel_measured_ = odom_encoder_coef_ / right_enc;
-  }
-  else
-  {
-    right_vel_measured_ = -odom_encoder_coef_ / right_enc;
-  }
+    int left_enc = robot_data_[i_ENCODER_INTERVAL_MOTOR_LEFT];
+    int right_enc = robot_data_[i_ENCODER_INTERVAL_MOTOR_RIGHT];
 
+    if(left_rpm > 0){
+      left_vel_measured_ = (float) left_rpm / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB;
+    }
+    else if(left_rpm < 0){
+      left_vel_measured_ = (float) left_rpm / MOTOR_RPM_TO_MPS_RATIO - MOTOR_RPM_TO_MPS_CFB;
+    }
+    else{
+      left_vel_measured_ = 0;
+    }
+
+    if(right_rpm > 0){
+      right_vel_measured_ = (float) right_rpm / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB;
+    }
+    else if(right_rpm < 0){
+      right_vel_measured_ = (float) right_rpm / MOTOR_RPM_TO_MPS_RATIO - MOTOR_RPM_TO_MPS_CFB;
+    }
+    else{
+      right_vel_measured_ = 0;
+    }
+
+    if(odom_axle_track_ == ODOM_AXLE_TRACK_F){
+      right_vel_measured_ /= WHEEL_TO_TRACK_RATIO;
+      left_vel_measured_ /= WHEEL_TO_TRACK_RATIO;
+    }
+
+  }
+  else{
+    //do it the old way
+    int left_enc = robot_data_[i_ENCODER_INTERVAL_MOTOR_LEFT];
+    int right_enc = robot_data_[i_ENCODER_INTERVAL_MOTOR_RIGHT];
+
+    // Bound left_encoder readings to range of normal operation.
+    if (left_enc < ENCODER_MIN)
+    {
+      left_vel_measured_ = 0;
+    }
+    else if (left_enc > ENCODER_MAX)
+    {
+      left_vel_measured_ = 0;
+    }
+    else if (motor_speeds_commanded_[LEFT_MOTOR_INDEX_] > MOTOR_NEUTRAL)  // this sets direction of measured
+    {
+      left_vel_measured_ = odom_encoder_coef_ / left_enc;
+    }
+    else
+    {
+      left_vel_measured_ = -odom_encoder_coef_ / left_enc;
+    }
+
+    // Bound right_encoder readings to range of normal operation.
+    if (right_enc < ENCODER_MIN)
+    {
+      right_vel_measured_ = 0;
+    }
+    else if (right_enc > ENCODER_MAX)
+    {
+      right_vel_measured_ = 0;
+    }
+    else if (motor_speeds_commanded_[RIGHT_MOTOR_INDEX_] > MOTOR_NEUTRAL)  // this sets direction of measured
+    {
+      right_vel_measured_ = odom_encoder_coef_ / right_enc;
+    }
+    else
+    {
+      right_vel_measured_ = -odom_encoder_coef_ / right_enc;
+    }
+
+  }
   return;
 }
 
