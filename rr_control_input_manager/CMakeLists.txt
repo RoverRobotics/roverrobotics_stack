@@ -8,6 +8,9 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 )
 
+#add_message_files( FILES
+#  Status.msg)
+
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
