@@ -52,7 +52,7 @@ namespace rr_rover_zero_v2_driver
     int fw_version_major_;      ///< firmware major version reported by vesc
     int fw_version_minor_;      ///< firmware minor version reported by vesc
     int id = 0;
-
+    float trim;
     // ROS callbacks
     void timerCallback(const ros::TimerEvent &event);
     void trimCB(const std_msgs::Float32::ConstPtr& msg);
