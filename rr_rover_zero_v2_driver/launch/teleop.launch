@@ -18,7 +18,7 @@
     <remap from="/cmd_vel" to="/cmd_vel/managed" />
   </node>
 
-  <!--    &lt;!&ndash;  Twist Mux  &ndash;&gt;-->
+  <!--Twist Mux -->
   <node pkg="twist_mux" type="twist_mux" name="twist_mux" output="screen">
       <remap from="cmd_vel_out" to="/cmd_vel/managed"/>
 

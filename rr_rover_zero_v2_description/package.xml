@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>rr_rover_zero_v2_description</name>
+  <version>1.2.4</version>
+  <description>
+    3D models of the Rover Zero for simulation and visualization
+  </description>
+  <license>Apache 2.0</license>
+  <maintainer email="will@roverrobotics.com">William Rook</maintainer>
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>urdf</depend>
+  <depend>xacro</depend>
+</package>

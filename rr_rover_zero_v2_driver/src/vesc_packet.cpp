@@ -381,6 +381,22 @@ namespace rr_rover_zero_v2_driver
     *(frame_->end() - 2) = static_cast<uint8_t>(crc & 0xFF);
   }
 
+  VescPacketSetRPM::VescPacketSetRPM(double rpm, int m2_address) : VescPacket("CanSetRPM", 7, COMM_FORWARD_CAN)
+  {
+    int32_t v = static_cast<int32_t>(rpm);
+    *(payload_.first + 1) = static_cast<uint8_t>(m2_address);
+    *(payload_.first + 2) = static_cast<uint8_t>(COMM_SET_RPM);
+    *(payload_.first + 3) = static_cast<uint8_t>((static_cast<uint32_t>(v) >> 24) & 0xFF);
+    *(payload_.first + 4) = static_cast<uint8_t>((static_cast<uint32_t>(v) >> 16) & 0xFF);
+    *(payload_.first + 5) = static_cast<uint8_t>((static_cast<uint32_t>(v) >> 8) & 0xFF);
+    *(payload_.first + 6) = static_cast<uint8_t>(static_cast<uint32_t>(v) & 0xFF);
+    VescFrame::CRC crc_calc;
+    crc_calc.process_bytes(&(*payload_.first), boost::distance(payload_));
+    uint16_t crc = crc_calc.checksum();
+    *(frame_->end() - 3) = static_cast<uint8_t>(crc >> 8);
+    *(frame_->end() - 2) = static_cast<uint8_t>(crc & 0xFF);
+  }
+
   /*------------------------------------------------------------------------------------------------*/
 
   VescPacketSetPos::VescPacketSetPos(double pos) : VescPacket("SetPos", 5, COMM_SET_POS)

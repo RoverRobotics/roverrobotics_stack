@@ -10,8 +10,10 @@
 #include <std_msgs/Float32.h>
 #include <std_msgs/Bool.h>
 #include <boost/optional.hpp>
+#include "nav_msgs/Odometry.h"
 #include "geometry_msgs/Twist.h"
-
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
+#include <tf/transform_broadcaster.h>
 #include "rr_rover_zero_v2_driver/vesc_interface.h"
 #include "rr_rover_zero_v2_driver/vesc_packet.h"
 
@@ -22,7 +24,7 @@ namespace rr_rover_zero_v2_driver
   {
   public:
     Rr_Rover_ZERO_V2_Driver(ros::NodeHandle nh,
-               ros::NodeHandle private_nh);
+                            ros::NodeHandle private_nh);
     bool e_stop_on_;
 
   private:
@@ -33,12 +35,13 @@ namespace rr_rover_zero_v2_driver
 
     // ROS services
     ros::Publisher state_pub_;
-    ros::Publisher state2_pub_;
+    ros::Publisher odom_enc_pub_;
     ros::Subscriber twist_sub_;
     ros::Subscriber trim_sub_;
     ros::Subscriber e_stop_sub;
     ros::Subscriber e_stop_reset_sub;
     ros::Timer timer_;
+    // tf::TransformBroadcaster odom_broadcaster;
 
     // driver modes (possible states)
     typedef enum
@@ -51,11 +54,14 @@ namespace rr_rover_zero_v2_driver
     driver_mode_t driver_mode_; ///< driver state machine mode (state)
     int fw_version_major_;      ///< firmware major version reported by vesc
     int fw_version_minor_;      ///< firmware minor version reported by vesc
-    int id = 0;
+    int motorID_ = 0;
+    double rpm_1 = 0;
+    double rpm_2 = 0;
     float trim;
     // ROS callbacks
     void timerCallback(const ros::TimerEvent &event);
-    void trimCB(const std_msgs::Float32::ConstPtr& msg);
+    void publishOdometry(float left_vel, float right_vel);
+    void trimCB(const std_msgs::Float32::ConstPtr &msg);
     void callbackTwist(const geometry_msgs::Twist &msg);
     void eStopCB(const std_msgs::Bool::ConstPtr &msg);
     void eStopResetCB(const std_msgs::Bool::ConstPtr &msg);
