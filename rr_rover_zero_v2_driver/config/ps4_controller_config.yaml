@@ -1,4 +1,4 @@
-stamped: false
+stamped: true
 inputs:
   linear:
     x: axis_left_y

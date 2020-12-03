@@ -13,6 +13,9 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   tf2
   tf
+  diagnostic_msgs
+  urdf
+  xacro
 )
 
 catkin_package(
