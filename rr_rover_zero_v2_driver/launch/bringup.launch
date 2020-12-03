@@ -135,6 +135,7 @@
     <group if="$(eval arg('mode') == 2)">
         <!-- AMCL -->
         <node pkg="amcl" type="amcl" name="amcl">
+            <rosparam file="$(find rr_rover_zero_v2_driver)/config/amcl.yaml" command="load" />
             <remap from="scan" to="scan"/>
         </node>
 
@@ -142,16 +143,16 @@
         <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
 
 
-
-        <!-- move_base -->
-        <!-- move_base -->
+        <!-- Move Base -->
         <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+            <rosparam file="$(find rr_rover_zero_v2_navigation)/config/base_local_planner.yaml" command="load" />
+
             <rosparam file="$(find rr_rover_zero_v2_navigation)/config/costmap_common_$(arg model).yaml" command="load" ns="global_costmap" />
             <rosparam file="$(find rr_rover_zero_v2_navigation)/config/global_costmap.yaml" command="load" />
-            
+
             <rosparam file="$(find rr_rover_zero_v2_navigation)/config/costmap_common_$(arg model).yaml" command="load" ns="local_costmap" />
             <rosparam file="$(find rr_rover_zero_v2_navigation)/config/local_costmap.yaml" command="load" />
-            
+
             <rosparam file="$(find rr_rover_zero_v2_navigation)/config/move_base.yaml" command="load" />
             <rosparam file="$(find rr_rover_zero_v2_navigation)/config/dwa_local_planner_$(arg model).yaml" command="load" />
         </node>
