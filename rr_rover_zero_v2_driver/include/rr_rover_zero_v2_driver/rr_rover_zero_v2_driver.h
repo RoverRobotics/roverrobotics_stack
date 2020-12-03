@@ -13,7 +13,8 @@
 #include "nav_msgs/Odometry.h"
 #include "geometry_msgs/Twist.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
-#include <tf/transform_broadcaster.h>
+#include <tf2_ros/transform_broadcaster.h>
+#include <geometry_msgs/TransformStamped.h>
 #include "rr_rover_zero_v2_driver/vesc_interface.h"
 #include "rr_rover_zero_v2_driver/vesc_packet.h"
 
@@ -26,6 +27,10 @@ namespace rr_rover_zero_v2_driver
     Rr_Rover_ZERO_V2_Driver(ros::NodeHandle nh,
                             ros::NodeHandle private_nh);
     bool e_stop_on_;
+    float trim;
+    double odom_angular_coef_ ;
+    double odom_traction_factor_ ;
+    double hall_ratio_;
 
   private:
     // interface to the VESC
@@ -41,8 +46,7 @@ namespace rr_rover_zero_v2_driver
     ros::Subscriber e_stop_sub;
     ros::Subscriber e_stop_reset_sub;
     ros::Timer timer_;
-    // tf::TransformBroadcaster odom_broadcaster;
-
+    
     // driver modes (possible states)
     typedef enum
     {
@@ -57,7 +61,7 @@ namespace rr_rover_zero_v2_driver
     int motorID_ = 0;
     double rpm_1 = 0;
     double rpm_2 = 0;
-    float trim;
+    
     // ROS callbacks
     void timerCallback(const ros::TimerEvent &event);
     void publishOdometry(float left_vel, float right_vel);

@@ -8,7 +8,8 @@
 #include "nav_msgs/Odometry.h"
 #include <boost/bind.hpp>
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
-#include <tf/transform_broadcaster.h>
+#include <tf2_ros/transform_broadcaster.h>
+#include <geometry_msgs/TransformStamped.h>
 #include <rr_rover_zero_v2_driver_msgs/VescStateStamped.h>
 
 const double wheel_base = 0.358775;
@@ -55,7 +56,14 @@ namespace rr_rover_zero_v2_driver
     trim_sub_ = nh.subscribe("/trim_increment", 1, &Rr_Rover_ZERO_V2_Driver::trimCB, this);
     // create a 50Hz timer, used for state machine & polling VESC telemetry
     timer_ = nh.createTimer(ros::Duration(1.0 / 50.0), &Rr_Rover_ZERO_V2_Driver::timerCallback, this);
-    trim = 0;
+
+    //Get Parameters
+    private_nh.getParam("trim", trim);
+    private_nh.getParam("odom_angular_coef", odom_angular_coef_);
+    private_nh.getParam("odom_traction_factor", odom_traction_factor_);
+    private_nh.getParam("hall_ratio", hall_ratio_);
+
+    ROS_INFO("got the following param values \n trim: %f \n odom_angular_coef: %f \n odom_traction_factor: %f \n hall_ratio: %f", trim, odom_angular_coef_, odom_traction_factor_, hall_ratio_);
   }
 
   void Rr_Rover_ZERO_V2_Driver::trimCB(const std_msgs::Float32::ConstPtr &msg)
@@ -101,7 +109,7 @@ namespace rr_rover_zero_v2_driver
       vesc_.requestState(8);
       right_vel_measured_ = rpm_2;
 
-      publishOdometry(left_vel_measured_/1600, right_vel_measured_/1600);
+      publishOdometry(left_vel_measured_ / hall_ratio_, right_vel_measured_ / hall_ratio_);
     }
     else
     {
@@ -197,21 +205,20 @@ namespace rr_rover_zero_v2_driver
           ROS_INFO("Rover driver - Soft e-stop off.");
         }
         double turn_rate = msg.angular.z;
-        double linear_rate = msg.angular.x;
+        double linear_rate = msg.linear.x;
         if (turn_rate == 0)
         {
-          if (linear_rate > 0)
+          if (linear_rate > 0.0)
           {
             turn_rate = trim;
           }
-          else if (linear_rate < 0)
+          else if (linear_rate < 0.0)
           {
             turn_rate = -trim;
           }
         }
-
-        vesc_.setDutyCycle(clip(msg.linear.x - 0.5 * turn_rate, -0.5, 0.5)/4);
-        vesc_.setDutyCycle(clip(msg.linear.x + 0.5 * turn_rate, -0.5, 0.5)/4, 8);
+        vesc_.setDutyCycle(clip(msg.linear.x - 0.5 * turn_rate, -0.5, 0.5) / 4);
+        vesc_.setDutyCycle(clip(msg.linear.x + 0.5 * turn_rate, -0.5, 0.5) / 4, 8);
         // vesc_.setCurrent(clip())
         //vesc_.setCurrent(4);
         // vesc_.setSpeed(clip(msg.linear.x - 0.5 * turn_rate,-5,5));
@@ -260,14 +267,12 @@ namespace rr_rover_zero_v2_driver
     double diff_vel = 0;
     double alpha = 0;
     double dt = 0;
-    double odom_angular_coef_ = 2.3;
-    double odom_traction_factor_ = 1;
 
     tf2::Quaternion q_new;
 
     ros::Time ros_now_time = ros::Time::now();
     double now_time = ros_now_time.toSec();
-    tf::TransformBroadcaster odom_broadcaster;
+    tf2_ros::TransformBroadcaster odom_broadcaster;
     nav_msgs::Odometry odom_msg;
 
     dt = now_time - past_time;
@@ -275,13 +280,8 @@ namespace rr_rover_zero_v2_driver
 
     if (past_time != 0)
     {
-      ROS_INFO("dt : %f", dt);
-      ROS_INFO("Left Vel : %f", left_vel);
-      ROS_INFO("Right Vel : %f", right_vel);
       net_vel = 0.5 * (left_vel + right_vel);
       diff_vel = right_vel - left_vel;
-      ROS_INFO("Net Vel : %f", net_vel);
-      ROS_INFO("Diff Vel : %f", diff_vel);
       alpha = odom_angular_coef_ * diff_vel * odom_traction_factor_;
 
       pos_x = pos_x + net_vel * cos(theta) * dt;
@@ -290,16 +290,21 @@ namespace rr_rover_zero_v2_driver
 
       q_new.setRPY(0, 0, theta);
       tf2::convert(q_new, odom_msg.pose.pose.orientation);
-      geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
+      // geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
       geometry_msgs::TransformStamped odom_trans;
-      odom_trans.header.stamp = ros_now_time;
+      odom_trans.header.stamp = ros::Time::now();
       odom_trans.header.frame_id = "odom";
       odom_trans.child_frame_id = "base_link";
       odom_trans.transform.translation.x = pos_x;
       odom_trans.transform.translation.y = pos_y;
       odom_trans.transform.translation.z = 0.0;
-      odom_trans.transform.rotation = odom_quat;
-      odom_broadcaster.sendTransform(odom_trans);
+      //odom_trans.transform.rotation = odom_quat;
+      odom_trans.transform.rotation.x = q_new.x();
+      odom_trans.transform.rotation.y = q_new.y();
+      odom_trans.transform.rotation.z = q_new.z();
+      odom_trans.transform.rotation.w = q_new.w();
+      //ROS_INFO("%f\n%f\n%f\n%f\n%f\n%f\n",pos_x,pos_y,q_new.x(),q_new.y(),q_new.z(),q_new.w());
+      // odom_broadcaster.sendTransform(odom_trans);
     }
 
     odom_msg.header.stamp = ros_now_time;
@@ -327,6 +332,7 @@ namespace rr_rover_zero_v2_driver
     odom_msg.pose.pose.position.x = pos_x;
     odom_msg.pose.pose.position.y = pos_y;
     odom_enc_pub_.publish(odom_msg);
+    ros::spinOnce();
     return;
   }
 

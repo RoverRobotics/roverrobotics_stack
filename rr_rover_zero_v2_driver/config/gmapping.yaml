@@ -28,7 +28,7 @@ llsamplestep: 0.01
 lasamplerange: 0.005
 lasamplestep: 0.005
 
-base_frame:  "base_footprint"
+base_frame:  "base_link"
 odom_frame:  "odom"
 map_frame:  "map"
 scan:  "base_scan" 
