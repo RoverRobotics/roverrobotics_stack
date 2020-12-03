@@ -1,0 +1,84 @@
+<launch>
+
+    <arg name="lidar" default="true"/>
+    <arg name="mode" default="0"/>
+    <!-- 0 for teleop 1 for gmapping and 2 for navigation -->
+    <arg name="model" default="dshape"/>
+    <arg name="node_name" default="rr_rover_zero_v2_driver_node" />
+
+    <!-- Optionally launch in GDB, for debugging -->
+    <arg name="debug" default="false" />
+    <arg if="$(arg debug)" name="launch_prefix" value="xterm -e gdb --args" />
+    <arg unless="$(arg debug)" name="launch_prefix" value="" />
+
+    <!-- Driver node -->
+    <node pkg="rr_rover_zero_v2_driver" type="rr_rover_zero_v2_driver_node" name="$(arg node_name)" output="screen" launch-prefix="$(arg launch_prefix)">
+        <rosparam command="load" file="$(find rr_rover_zero_v2_driver)/config/driver_config.yaml" />
+        <remap from="/cmd_vel" to="/cmd_vel/managed" />
+    </node>
+
+    <!--Twist Mux -->
+    <node pkg="twist_mux" type="twist_mux" name="twist_mux" output="screen">
+        <rosparam command="load" file="$(find rr_rover_zero_v2_driver)/config/twist_mux_locks.yaml"/>
+        <rosparam command="load" file="$(find rr_rover_zero_v2_driver)/config/twist_mux_topics.yaml"/>
+        <remap from="cmd_vel_out" to="/cmd_vel/managed"/>
+    </node>
+
+    <!--Control input manager-->
+    <node pkg="rr_control_input_manager" type="control_input_manager.py" name="rr_control_input_manager_node" output="log">
+        <rosparam file="$(find rr_control_input_manager)/config/input_topics.yaml" command="load"/>
+    </node>
+
+    <!-- RPLidar driver -->
+    <group if="$(eval arg('lidar') == false)">
+        <node name="rplidarNode" pkg="rplidar_ros" type="rplidarNode" output="screen">
+            <rosparam file="$(find rr_rover_zero_v2_driver)/config/lidar_config.yaml" command="load"/>
+        </node>
+    </group>
+
+    <!-- PS4 Ubuntu Driver -->
+    <include file="$(find ds4_driver)/launch/ds4_driver.launch"/>
+    <!-- PS4 Mapper -->
+    <node pkg="rr_control_input_manager" type="ps4_mapper.py" name="ps4_mapper" output="screen">
+        <rosparam command="load" file="$(find rr_rover_zero_v2_driver)/config/ps4_controller_config.yaml" />
+    </node>
+
+    <group if="$(eval arg('mode') == 1)">
+        <!-- Gmapping -->
+        <node pkg="gmapping" type="slam_gmapping" name="rr_rover_zero_v2_slam_gmapping" output="screen">
+            <param name="model" value="$(arg model)"/>
+            <rosparam command="load" file="$(find rr_rover_zero_v2_slam)/config/gmapping_params.yaml" />
+        </node>
+    </group>
+
+
+    <group if="$(eval arg('mode') == 2)">
+        <!-- AMCL -->
+        <node pkg="amcl" type="amcl" name="amcl">
+            <remap from="scan" to="scan"/>
+        </node>
+
+        <!-- Map server -->
+        <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
+
+        <!-- Robot State Publisher -->
+        <arg name="urdf_file" default="$(find xacro)/xacro --inorder '$(find rr_rover_zero_v2_description)/urdf/rr_rover_zero_v2_$(arg model).urdf.xacro'" />
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+            <param name="publish_frequency" type="double" value="100.0" />
+            <param name="robot_description" command="$(arg urdf_file)" />
+        </node>
+
+        <!-- move_base -->
+        <!-- move_base -->
+        <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+            <rosparam file="$(find rr_rover_zero_v2_driver)/config/costmap_common_params_$(arg model).yaml" command="load" ns="global_costmap" />
+            <rosparam file="$(find rr_rover_zero_v2_driver)/config/costmap_common_params_$(arg model).yaml" command="load" ns="local_costmap" />
+            <rosparam file="$(find rr_rover_zero_v2_driver)/config/local_costmap_params.yaml" command="load" />
+            <rosparam file="$(find rr_rover_zero_v2_driver)/config/global_costmap_params.yaml" command="load" />
+            <rosparam file="$(find rr_rover_zero_v2_driver)/config/move_base_params.yaml" command="load" />
+            <rosparam file="$(find rr_rover_zero_v2_driver)/config/dwa_local_planner_params_$(arg model).yaml" command="load" />
+            <rosparam file="$(find rr_rover_zero_v2_driver)/config/move_base_config.yaml" command="load" />
+        </node>
+    </group>
+
+</launch>
