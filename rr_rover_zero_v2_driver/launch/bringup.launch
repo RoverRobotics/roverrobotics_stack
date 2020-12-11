@@ -1,24 +1,23 @@
 <launch>
 
     <arg name="lidar" default="true"/>
-    <!-- 0 for teleop 1 for gmapping and 2 for navigation -->
 
-    <arg name="mode" default="2"/>
-
-    <arg name="model" default="dshape"/>
+    <!-- Possible mode = teleop/map/navigate -->
+    <!-- <arg name="mode" default="map"/> -->
+    <arg name="mode" default="$(env ROBOT_MODE)" doc="Please Set a ROBOT_MODE ! Possible modes [map, teleop, navigate]"/>
+    <arg name="model" default="$(env ROBOT_MODEL)" doc="Please Set a ROBOT_MODEL ! Possible model [rover, dshape, octagon]"/>
+    <!-- <arg name="model" default="dshape"/> -->
     <arg name="node_name" default="rr_rover_zero_v2_driver_node" />
     <arg name="map_file" default="$(find rr_rover_zero_v2_navigation)/maps/map.yaml"/>
-
-
-
-    <!-- DO NOT MODIFY BEYOND THIS POINT -->
-
-
+   
+   
     <!-- Optionally launch in GDB, for debugging -->
     <arg name="debug" default="false" />
     <arg if="$(arg debug)" name="launch_prefix" value="xterm -e gdb --args" />
     <arg unless="$(arg debug)" name="launch_prefix" value="" />
 
+
+    <!-- DO NOT MODIFY BEYOND THIS POINT -->
     <!-- Driver node -->
     <node pkg="rr_rover_zero_v2_driver" type="rr_rover_zero_v2_driver_node" name="$(arg node_name)" output="screen" launch-prefix="$(arg launch_prefix)">
         <rosparam command="load" file="$(find rr_rover_zero_v2_driver)/config/driver.yaml" />
@@ -123,7 +122,7 @@
     </node>
 
 
-    <group if="$(eval arg('mode') == 1)">
+    <group if="$(eval arg('mode') == 'map')">
         <!-- Gmapping -->
         <node pkg="gmapping" type="slam_gmapping" name="rr_rover_zero_v2_slam_gmapping" output="screen">
             <param name="model" value="$(arg model)"/>
@@ -132,7 +131,7 @@
     </group>
 
 
-    <group if="$(eval arg('mode') == 2)">
+    <group if="$(eval arg('mode') == 'navigate')">
         <!-- AMCL -->
         <node pkg="amcl" type="amcl" name="amcl">
             <rosparam file="$(find rr_rover_zero_v2_driver)/config/amcl.yaml" command="load" />
@@ -145,7 +144,9 @@
 
         <!-- Move Base -->
         <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-            <rosparam file="$(find rr_rover_zero_v2_navigation)/config/base_local_planner.yaml" command="load" />
+            <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+            <!-- <rosparam file="$(find rr_rover_zero_v2_navigation)/config/base_local_planner.yaml" command="load" /> -->
+            <rosparam file="$(find rr_rover_zero_v2_navigation)/config/dwa_local_planner_$(arg model).yaml" command="load" />
 
             <rosparam file="$(find rr_rover_zero_v2_navigation)/config/costmap_common_$(arg model).yaml" command="load" ns="global_costmap" />
             <rosparam file="$(find rr_rover_zero_v2_navigation)/config/global_costmap.yaml" command="load" />
@@ -154,7 +155,6 @@
             <rosparam file="$(find rr_rover_zero_v2_navigation)/config/local_costmap.yaml" command="load" />
 
             <rosparam file="$(find rr_rover_zero_v2_navigation)/config/move_base.yaml" command="load" />
-            <rosparam file="$(find rr_rover_zero_v2_navigation)/config/dwa_local_planner_$(arg model).yaml" command="load" />
         </node>
 
         <!-- Map to Odom EKF -->

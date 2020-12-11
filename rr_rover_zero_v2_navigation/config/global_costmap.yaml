@@ -2,7 +2,7 @@ global_costmap:
   global_frame: map
   robot_base_frame: base_link
   update_frequency: 5
-  static_map: true
+  # static_map: false
 
   plugins:
     - {name: static_layer,            type: "costmap_2d::StaticLayer"}
