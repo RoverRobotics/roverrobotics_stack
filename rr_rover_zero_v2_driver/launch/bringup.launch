@@ -134,7 +134,9 @@
     <group if="$(eval arg('mode') == 'navigate')">
         <!-- AMCL -->
         <node pkg="amcl" type="amcl" name="amcl">
-            <rosparam file="$(find rr_rover_zero_v2_driver)/config/amcl.yaml" command="load" />
+            <rosparam file="$(find rr_rover_zero_v2_navigation)/config/amcl.yaml" command="load" />
+            <!-- <rosparam file="$(find rr_rover_zero_v2_navigation)/config/config.yaml" command="load" /> -->
+            
             <remap from="scan" to="scan"/>
         </node>
 
@@ -144,17 +146,7 @@
 
         <!-- Move Base -->
         <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-            <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
-            <!-- <rosparam file="$(find rr_rover_zero_v2_navigation)/config/base_local_planner.yaml" command="load" /> -->
-            <rosparam file="$(find rr_rover_zero_v2_navigation)/config/dwa_local_planner_$(arg model).yaml" command="load" />
-
-            <rosparam file="$(find rr_rover_zero_v2_navigation)/config/costmap_common_$(arg model).yaml" command="load" ns="global_costmap" />
-            <rosparam file="$(find rr_rover_zero_v2_navigation)/config/global_costmap.yaml" command="load" />
-
-            <rosparam file="$(find rr_rover_zero_v2_navigation)/config/costmap_common_$(arg model).yaml" command="load" ns="local_costmap" />
-            <rosparam file="$(find rr_rover_zero_v2_navigation)/config/local_costmap.yaml" command="load" />
-
-            <rosparam file="$(find rr_rover_zero_v2_navigation)/config/move_base.yaml" command="load" />
+            <rosparam file="$(find rr_rover_zero_v2_navigation)/config/config.yaml" command="load" />
         </node>
 
         <!-- Map to Odom EKF -->
