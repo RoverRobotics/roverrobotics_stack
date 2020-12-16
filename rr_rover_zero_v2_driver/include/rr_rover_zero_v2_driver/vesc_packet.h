@@ -170,7 +170,7 @@ class VescPacketSetRPM : public VescPacket
 {
 public:
   VescPacketSetRPM(double rpm);
-
+  VescPacketSetRPM(double rpm, int m2_address);
   //  double rpm() const;
 };
 
