@@ -16,7 +16,7 @@
     <visual>
       <origin xyz="0 -0.08 0.0" rpy="0 0 1.57"/>
       <geometry>
-        <mesh filename="package://rr_rover_zero_v2_description/meshes/bases/dshape_base.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://rr_rover_zero_v2_description/meshes/bases/dshape_base_2.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="light_black"/>
     </visual>
