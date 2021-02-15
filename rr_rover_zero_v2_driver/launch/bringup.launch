@@ -2,6 +2,9 @@
 
     <arg name="lidar" default="true"/>
 
+    <!-- IntelRealsense Driver -->
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch"/>
+
     <!-- Possible mode = teleop/map/navigate -->
     <!-- <arg name="mode" default="map"/> -->
     <arg name="mode" default="$(env ROBOT_MODE)" doc="Please Set a ROBOT_MODE ! Possible modes [map, teleop, navigate]"/>
@@ -36,12 +39,13 @@
         <rosparam file="$(find rr_control_input_manager)/config/input_topics.yaml" command="load"/>
     </node>
 
-    <!-- RPLidar driver -->
+    <!-- RPLidar driver
     <group if="$(eval arg('lidar') == true)">
         <node name="rplidarNode" pkg="rplidar_ros" type="rplidarNode" output="screen">
             <rosparam file="$(find rr_rover_zero_v2_driver)/config/lidar.yaml" command="load"/>
         </node>
     </group>
+    -->
 
     <!-- PS4 Ubuntu Driver -->
     <include file="$(find ds4_driver)/launch/ds4_driver.launch"/>
@@ -75,6 +79,11 @@
         <param name="print_diagnostics" value="true" />
         <param name="debug" value="false" />
         <param name="debug_out_file" value="debug_odom_ekf.txt" />
+        <rosparam param="initial_state">[0.0,  0.0,  0.0,
+                                         0.0,  0.0,  0.0,
+                                         0.0,  0.0,  0.0,
+                                         0.0,  0.0,  0.0,
+                                         0.0,  0.0,  0.0]</rosparam>
         <rosparam param="process_noise_covariance">[0.05, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
                                                     0,    0.05, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
                                                     0,    0,    0.06, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -142,7 +151,6 @@
 
         <!-- Map Server -->
         <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
-
 
         <!-- Move Base -->
         <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">

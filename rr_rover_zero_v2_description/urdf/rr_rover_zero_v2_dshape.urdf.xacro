@@ -9,12 +9,12 @@
   <joint name="base_joint" type="fixed">
     <parent link="base_footprint"/>
     <child link="base_link" />
-    <origin xyz="0 0.125 0.00" rpy="0 0 1.57"/>
+    <origin xyz="0 0 0.0" rpy="0 0 1.57"/>
   </joint>
 
   <link name="base_link">
     <visual>
-      <origin xyz="-0.25 0 0" rpy="1.57 0 1.57"/>
+      <origin xyz="0 -0.08 0.0" rpy="0 0 1.57"/>
       <geometry>
         <mesh filename="package://rr_rover_zero_v2_description/meshes/bases/dshape_base.stl" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -38,13 +38,13 @@
   <joint name="wheel_left_joint" type="fixed">
     <parent link="base_link"/>
     <child link="wheel_left_link"/>
-    <origin xyz="0.0 0.144 0.023" rpy="0 0 0"/>
+    <origin xyz="-0.04 0.18 0.09" rpy="0 0 0"/>
     <axis xyz="0 0 1"/>
   </joint>
 
   <link name="wheel_left_link">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 -1.57"/>
+      <origin xyz="0.05 -0.25 -0.27" rpy="0 0 1.57"/>
       <geometry>
         <mesh filename="package://rr_rover_zero_v2_description/meshes/wheels/dshape_wheel.stl" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -68,13 +68,13 @@
   <joint name="wheel_right_joint" type="fixed">
     <parent link="base_link"/>
     <child link="wheel_right_link"/>
-    <origin xyz="0.0 -0.144 0.023" rpy="0 0 0"/>
+    <origin xyz="-0.04 -0.18 0.09" rpy="0 0 0"/>
     <axis xyz="0 0 0"/>
   </joint>
 
   <link name="wheel_right_link">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 1.57"/>
+      <origin xyz="-0.05 0.25 -0.27" rpy="0 0 -1.57"/>
       <geometry>
         <mesh filename="package://rr_rover_zero_v2_description/meshes/wheels/dshape_wheel.stl" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -123,6 +123,7 @@
     <origin xyz="0 0 0" rpy="0 0 3.14159"/>
   </joint>
 
+
   <link name="base_scan">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -145,4 +146,37 @@
       <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001" />
     </inertial>
   </link>
+
+
+  <joint name="camera_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+    <origin xyz="0.1 0 0.4" rpy="-1.57 0 0"/>
+  </joint>
+
+
+  <link name="camera_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.0315" radius="0.055"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0.015 0 -0.0065" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.0315" radius="0.055"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="0.114" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001" />
+    </inertial>
+  </link>
+
+
 </robot>
