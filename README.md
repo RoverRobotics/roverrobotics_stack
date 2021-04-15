@@ -4,9 +4,9 @@ The rover platform accept velocity commands and publishes wheel encoder data and
 
 
 ## Supported Rovers
-Rover Pro
-Rover Zero
-Rover Zero 2
+- Rover Pro
+- Rover Zero
+- Rover Zero 2
 
 Documentation for this package can be found at http://wiki.ros.org/rr_openrover_stack
 
