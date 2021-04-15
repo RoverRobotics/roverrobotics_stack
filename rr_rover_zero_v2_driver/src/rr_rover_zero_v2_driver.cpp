@@ -49,11 +49,16 @@ namespace rr_rover_zero_v2_driver
     e_stop_sub = nh.subscribe("/soft_estop/enable", 1, &Rr_Rover_ZERO_V2_Driver::eStopCB, this);
     e_stop_reset_sub = nh.subscribe("/soft_estop/reset", 1, &Rr_Rover_ZERO_V2_Driver::eStopResetCB, this);
     twist_sub_ = nh.subscribe("/cmd_vel/", 1, &Rr_Rover_ZERO_V2_Driver::callbackTwist, this);
-
+    trim_sub_ = nh.subscribe("/trim_increment", 1, &Rr_Rover_ZERO_V2_Driver::trimCB, this);
     // create a 50Hz timer, used for state machine & polling VESC telemetry
     timer_ = nh.createTimer(ros::Duration(1.0 / 50.0), &Rr_Rover_ZERO_V2_Driver::timerCallback, this);
+    trim = 0;
   }
 
+  void Rr_Rover_ZERO_V2_Driver::trimCB(const std_msgs::Float32::ConstPtr& msg){//Get trim_increment value
+    trim+= msg->data;
+    ROS_INFO("Trim value is at %f", trim);
+  }
   void Rr_Rover_ZERO_V2_Driver::timerCallback(const ros::TimerEvent &event)
   {
     // VESC interface should not unexpectedly disconnect, but test for it anyway
@@ -186,8 +191,19 @@ namespace rr_rover_zero_v2_driver
           prev_e_stop_state_ = false;
           ROS_INFO("Rover driver - Soft e-stop off.");
         }
-        vesc_.setDutyCycle(clip(msg.linear.x - 0.5 * msg.angular.z, -0.5, 0.5));
-        vesc_.setDutyCycle(clip(msg.linear.x + 0.5 * msg.angular.z, -0.5, 0.5), 8);
+	double turn_rate = msg.angular.z;
+        double linear_rate = msg.angular.x;
+	if (turn_rate == 0){
+    		if(linear_rate > 0){
+      			turn_rate = trim;
+    		}
+    		else if(linear_rate <0){
+      			turn_rate = -trim;
+    		}
+  	}
+	
+        vesc_.setDutyCycle(clip(msg.linear.x - 0.5 * turn_rate, -0.5, 0.5));
+        vesc_.setDutyCycle(clip(msg.linear.x + 0.5 * turn_rate, -0.5, 0.5), 8);
       }
     }
   }

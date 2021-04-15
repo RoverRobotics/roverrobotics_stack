@@ -9,7 +9,7 @@ elif [ -h "/dev/rover-zero" ]; then
         roslaunch rr_rover_zero_driver teleop.launch &
         echo "Launched Rover Zero driver from service"
 elif [ -h "/dev/rover-zero-v2" ]; then
-        roslaunch rr_rover_zero_v2_driver teleop.launch &
+        roslaunch rr_rover_zero_v2_driver bringup.launch &
         echo "Launched Rover Zero V2 Driver from service"
 else
         echo "No Robot Found, is your Udev Rule setup correctly?"

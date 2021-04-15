@@ -7,6 +7,7 @@
 
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
+#include <std_msgs/Float32.h>
 #include <std_msgs/Bool.h>
 #include <boost/optional.hpp>
 #include "geometry_msgs/Twist.h"
@@ -34,6 +35,7 @@ namespace rr_rover_zero_v2_driver
     ros::Publisher state_pub_;
     ros::Publisher state2_pub_;
     ros::Subscriber twist_sub_;
+    ros::Subscriber trim_sub_;
     ros::Subscriber e_stop_sub;
     ros::Subscriber e_stop_reset_sub;
     ros::Timer timer_;
@@ -50,9 +52,10 @@ namespace rr_rover_zero_v2_driver
     int fw_version_major_;      ///< firmware major version reported by vesc
     int fw_version_minor_;      ///< firmware minor version reported by vesc
     int id = 0;
-
+    float trim;
     // ROS callbacks
     void timerCallback(const ros::TimerEvent &event);
+    void trimCB(const std_msgs::Float32::ConstPtr& msg);
     void callbackTwist(const geometry_msgs::Twist &msg);
     void eStopCB(const std_msgs::Bool::ConstPtr &msg);
     void eStopResetCB(const std_msgs::Bool::ConstPtr &msg);
