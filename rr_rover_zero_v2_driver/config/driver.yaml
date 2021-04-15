@@ -1,0 +1,5 @@
+port: "/dev/rover-zero-v2" 
+trim: 0 
+odom_angular_coef: 2.3 
+odom_traction_factor: 1
+hall_ratio: 1600

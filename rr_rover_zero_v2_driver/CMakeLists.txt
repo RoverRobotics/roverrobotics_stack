@@ -7,6 +7,15 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   rr_rover_zero_v2_driver_msgs
   serial
+  # message_generation
+  geometry_msgs
+  sensor_msgs
+  nav_msgs
+  tf2
+  tf
+  diagnostic_msgs
+  urdf
+  xacro
 )
 
 catkin_package(

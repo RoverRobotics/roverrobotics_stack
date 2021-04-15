@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>rr_rover_zero_v2_navigation</name>
+  <version>1.2.4</version>
+  <description>
+    The rr_rover_zero_v2_navigation provides roslaunch scripts for starting the navigation.
+  </description>
+  <license>TBD</license>
+  <maintainer email="will@roverrobotics.com">William Rook</maintainer>
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>amcl</exec_depend>
+  <exec_depend>map_server</exec_depend>
+  <exec_depend>move_base</exec_depend>
+  <exec_depend>rr_rover_zero_v2_bringup</exec_depend>
+</package>

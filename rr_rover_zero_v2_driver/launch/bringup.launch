@@ -1,0 +1,230 @@
+<launch>
+
+    <arg name="lidar" default="true"/>
+
+    <!-- IntelRealsense Driver -->
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch"/>
+
+    <!-- Possible mode = teleop/map/navigate -->
+    <!-- <arg name="mode" default="map"/> -->
+    <arg name="mode" default="$(env ROBOT_MODE)" doc="Please Set a ROBOT_MODE ! Possible modes [map, teleop, navigate]"/>
+    <arg name="model" default="$(env ROBOT_MODEL)" doc="Please Set a ROBOT_MODEL ! Possible model [rover, dshape, octagon]"/>
+    <!-- <arg name="model" default="dshape"/> -->
+    <arg name="node_name" default="rr_rover_zero_v2_driver_node" />
+    <arg name="map_file" default="$(find rr_rover_zero_v2_navigation)/maps/map.yaml"/>
+   
+   
+    <!-- Optionally launch in GDB, for debugging -->
+    <arg name="debug" default="false" />
+    <arg if="$(arg debug)" name="launch_prefix" value="xterm -e gdb --args" />
+    <arg unless="$(arg debug)" name="launch_prefix" value="" />
+
+
+    <!-- DO NOT MODIFY BEYOND THIS POINT -->
+    <!-- Driver node -->
+    <node pkg="rr_rover_zero_v2_driver" type="rr_rover_zero_v2_driver_node" name="$(arg node_name)" output="screen" launch-prefix="$(arg launch_prefix)">
+        <rosparam command="load" file="$(find rr_rover_zero_v2_driver)/config/driver.yaml" />
+        <remap from="/cmd_vel" to="/cmd_vel/managed" />
+    </node>
+
+    <!--Twist Mux -->
+    <node pkg="twist_mux" type="twist_mux" name="twist_mux" output="screen">
+        <rosparam command="load" file="$(find rr_rover_zero_v2_driver)/config/twist_mux_locks.yaml"/>
+        <rosparam command="load" file="$(find rr_rover_zero_v2_driver)/config/twist_mux_topics.yaml"/>
+        <remap from="cmd_vel_out" to="/cmd_vel/managed"/>
+    </node>
+
+    <!--Control input manager-->
+    <node pkg="rr_control_input_manager" type="control_input_manager.py" name="rr_control_input_manager_node" output="log">
+        <rosparam file="$(find rr_control_input_manager)/config/input_topics.yaml" command="load"/>
+    </node>
+
+    <!-- RPLidar driver
+    <group if="$(eval arg('lidar') == true)">
+        <node name="rplidarNode" pkg="rplidar_ros" type="rplidarNode" output="screen">
+            <rosparam file="$(find rr_rover_zero_v2_driver)/config/lidar.yaml" command="load"/>
+        </node>
+    </group>
+    -->
+
+    <!-- PS4 Ubuntu Driver -->
+    <include file="$(find ds4_driver)/launch/ds4_driver.launch"/>
+    <!-- PS4 Mapper -->
+    <node pkg="rr_control_input_manager" type="ps4_mapper.py" name="ps4_mapper" output="screen">
+        <rosparam command="load" file="$(find rr_rover_zero_v2_driver)/config/ps4_controller.yaml" />
+    </node>
+
+    <!-- Odom node (Encoders) -->
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_odom_node">
+        <param name="frequency" value="30"/>
+        <param name="publish_tf" value="true" />
+        <param name="sensor_timeout" value="0.5"/>
+        <param name="two_d_mode" value="true"/>
+        <remap from="odometry/filtered" to="odom/ekf/enc"/>
+        <param name="map_frame" value="map"/>
+        <param name="odom_frame" value="odom"/>
+        <param name="base_link_frame" value="base_link"/>
+        <param name="world_frame" value="odom"/>
+        <param name="transform_time_offset" value="0.0"/>
+        <param name="odom0" value="/odom"/>
+        <param name="odom0_differential" value="false" />
+        <param name="odom0_relative" value="false" />
+        <param name="odom0_queue_size" value="10" />
+        <rosparam param="odom0_config">[false,  false,  false,
+                                        false,  false,  false,
+                                         true,   true,   false,
+                                        false,  false,  true,
+                                        false,  false,  false]
+        </rosparam>
+        <param name="print_diagnostics" value="true" />
+        <param name="debug" value="false" />
+        <param name="debug_out_file" value="debug_odom_ekf.txt" />
+        <rosparam param="initial_state">[0.0,  0.0,  0.0,
+                                         0.0,  0.0,  0.0,
+                                         0.0,  0.0,  0.0,
+                                         0.0,  0.0,  0.0,
+                                         0.0,  0.0,  0.0]</rosparam>
+        <rosparam param="process_noise_covariance">[0.05, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0.05, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0.06, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0.03, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0.03, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0.01, 0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0.025,0,    0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0.025,0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0,    0.04, 0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01, 0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01, 0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.02, 0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01, 0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01, 0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.005]</rosparam>
+        <rosparam param="initial_estimate_covariance">[1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                       0,    1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                       0,    0,    1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                       0,    0,    0,    1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                       0,    0,    0,    0,    1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                       0,    0,    0,    0,    0,    1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                       0,    0,    0,    0,    0,    0,    1e-9 ,0,    0,    0,    0,    0,    0,    0,    0,
+                                                       0,    0,    0,    0,    0,    0,    0,    1e-9 ,0,    0,    0,    0,    0,    0,    0,
+                                                       0,    0,    0,    0,    0,    0,    0,    0,    1e-9, 0,    0,    0,    0,    0,    0,
+                                                       0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9, 0,    0,    0,    0,    0,
+                                                       0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9, 0,    0,    0,    0,
+                                                       0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9 ,0,    0,    0,
+                                                       0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9, 0,    0,
+                                                       0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9, 0,
+                                                       0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9]</rosparam>
+    </node>
+
+
+    <include file="$(find rr_rover_zero_v2_driver)/launch/includes/description.launch.xml">
+        <arg name="model" value="$(arg model)" />
+        <arg name="urdf_file" default="$(find xacro)/xacro --inorder '$(find rr_rover_zero_v2_description)/urdf/rr_rover_zero_v2_$(arg model).urdf.xacro'" />
+        <param name="robot_description" command="$(arg urdf_file)" />
+
+    </include>
+    <!-- Robot State Publisher -->
+    <arg name="urdf_file" default="$(find xacro)/xacro --inorder '$(find rr_rover_zero_v2_description)/urdf/rr_rover_zero_v2_$(arg model).urdf.xacro'" />
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+        <param name="publish_frequency" type="double" value="100.0" />
+        <param name="robot_description" command="$(arg urdf_file)" />
+    </node>
+
+
+    <group if="$(eval arg('mode') == 'map')">
+        <!-- Gmapping -->
+        <node pkg="gmapping" type="slam_gmapping" name="rr_rover_zero_v2_slam_gmapping" output="screen">
+            <param name="model" value="$(arg model)"/>
+            <rosparam command="load" file="$(find rr_rover_zero_v2_driver)/config/gmapping.yaml" />
+        </node>
+    </group>
+
+
+    <group if="$(eval arg('mode') == 'navigate')">
+        <!-- AMCL -->
+        <node pkg="amcl" type="amcl" name="amcl">
+            <rosparam file="$(find rr_rover_zero_v2_navigation)/config/amcl.yaml" command="load" />
+            <!-- <rosparam file="$(find rr_rover_zero_v2_navigation)/config/config.yaml" command="load" /> -->
+            
+            <remap from="scan" to="scan"/>
+        </node>
+
+        <!-- Map Server -->
+        <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
+
+        <!-- Move Base -->
+        <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+            <rosparam file="$(find rr_rover_zero_v2_navigation)/config/config.yaml" command="load" />
+        </node>
+
+        <!-- Map to Odom EKF -->
+
+        <node pkg="robot_localization" type="ekf_localization_node" name="ekf_map_node">
+            <param name="frequency" value="30"/>
+            <param name="publish_tf" value="true" />
+            <param name="sensor_timeout" value="0.5"/>
+            <param name="two_d_mode" value="true"/>
+            <remap from="odometry/filtered" to="odom/ekf/map"/>
+            <param name="map_frame" value="map"/>
+            <param name="odom_frame" value="odom"/>
+            <param name="base_link_frame" value="base_link"/>
+            <param name="world_frame" value="map"/>
+            <param name="transform_time_offset" value="0.0"/>
+            <param name="odom0" value="/odom/ekf/enc"/>
+            <param name="odom0_differential" value="false" />
+            <param name="odom0_relative" value="false" />
+            <param name="odom0_queue_size" value="10" />
+            <rosparam param="odom0_config">[false,  false,  false,
+                                        false,  false,  false,
+                                         true,   true,   false,
+                                        false,  false,  true,
+                                        false,  false,  false]
+            </rosparam>
+
+            <param name="pose0" value="/amcl_pose"/>
+            <param name="pose0_differential" value="false" />
+            <param name="pose0_relative" value="true" />
+            <param name="pose0_queue_size" value="10" />
+            <rosparam param="pose0_config">[true,  true,  false,
+                                        false,  false,  true,
+                                         false,   false,   false,
+                                        false,  false,  false,
+                                        false,  false,  false]
+            </rosparam>
+            <param name="print_diagnostics" value="true" />
+            <param name="debug" value="false" />
+            <param name="debug_out_file" value="debug_map_ekf.txt" />
+            <rosparam param="process_noise_covariance">[0.05, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0.05, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0.06, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0.03, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0.03, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0.01, 0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0.025,0,    0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0.025,0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0,    0.04, 0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01, 0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01, 0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.02, 0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01, 0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01, 0,
+                                                    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.005]</rosparam>
+            <rosparam param="initial_estimate_covariance">[1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                       0,    1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                       0,    0,    1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                       0,    0,    0,    1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                       0,    0,    0,    0,    1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                       0,    0,    0,    0,    0,    1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,
+                                                       0,    0,    0,    0,    0,    0,    1e-9 ,0,    0,    0,    0,    0,    0,    0,    0,
+                                                       0,    0,    0,    0,    0,    0,    0,    1e-9 ,0,    0,    0,    0,    0,    0,    0,
+                                                       0,    0,    0,    0,    0,    0,    0,    0,    1e-9, 0,    0,    0,    0,    0,    0,
+                                                       0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9, 0,    0,    0,    0,    0,
+                                                       0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9, 0,    0,    0,    0,
+                                                       0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9 ,0,    0,    0,
+                                                       0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9, 0,    0,
+                                                       0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9, 0,
+                                                       0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9]</rosparam>
+        </node>
+    </group>
+
+</launch>
