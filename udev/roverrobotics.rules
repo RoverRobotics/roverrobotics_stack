@@ -1,10 +1,8 @@
 # set the udev rule , make the device_port be fixed by rplidar
-#
-KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", MODE:="0777", SYMLINK+="rplidar"
-# creates fixed name for rover serial communication
-KERNEL=="ttyUSB[0-9]", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", MODE:="0777", SYMLINK+="rover", RUN+="/bin/setserial /dev/%k low_latency"
-KERNEL=="ttyUSB[0-9]", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6015", MODE:="0777", SYMLINK+="rover", RUN+="/bin/setserial /dev/%k low_latency"
 # rover zero
 KERNEL=="ttyACM*", ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2404", MODE:="0777", SYMLINK+="rover-zero"
+# creates fixed name for rover serial communication
 # rover zero v2
-KERNEL=="ttyACM*", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5740", MODE:="0777", SYMLINK+="rover-zero-v2"
+KERNEL=="ttyUSB[0-9]", ATTRS{idVendor}=="0403", ATTRS{serial}=="RoverZeroV2", MODE:="0777", SYMLINK+="rover-zero-v2", RUN+="/bin/setserial /dev/%k low_latency"
+# rover pro
+KERNEL=="ttyUSB[0-9]", ATTRS{idVendor}=="0403", ATTRS{serial}=="RoverPro", MODE:="0777", SYMLINK+="rover-pro", RUN+="/bin/setserial /dev/%k low_latency"
