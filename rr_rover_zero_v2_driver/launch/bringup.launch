@@ -8,7 +8,7 @@
     <!-- Possible mode = teleop/map/navigate -->
     <!-- <arg name="mode" default="map"/> -->
     <arg name="mode" default="$(env ROBOT_MODE)" doc="Please Set a ROBOT_MODE ! Possible modes [map, teleop, navigate]"/>
-    <arg name="model" default="$(env ROBOT_MODEL)" doc="Please Set a ROBOT_MODEL ! Possible model [rover, dshape, octagon]"/>
+    <arg name="model" default="rover"/>
     <!-- <arg name="model" default="dshape"/> -->
     <arg name="node_name" default="rr_rover_zero_v2_driver_node" />
     <arg name="map_file" default="$(find rr_rover_zero_v2_navigation)/maps/map.yaml"/>
