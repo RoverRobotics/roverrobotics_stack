@@ -217,12 +217,8 @@ namespace rr_rover_zero_v2_driver
             turn_rate = -trim;
           }
         }
-        vesc_.setDutyCycle(clip(msg.linear.x - 0.5 * turn_rate, -0.5, 0.5) / 4);
-        vesc_.setDutyCycle(clip(msg.linear.x + 0.5 * turn_rate, -0.5, 0.5) / 4, 8);
-        // vesc_.setCurrent(clip())
-        //vesc_.setCurrent(4);
-        // vesc_.setSpeed(clip(msg.linear.x - 0.5 * turn_rate,-5,5));
-        // vesc_.setSpeed(clip(msg.linear.x + 0.5 * turn_rate,-5,5) , 8);
+        vesc_.setDutyCycle(clip(msg.linear.x - 0.5 * turn_rate, -0.95, 0.95));
+        vesc_.setDutyCycle(clip(msg.linear.x + 0.5 * turn_rate, -0.95, 0.95), 8);
       }
     }
   }
